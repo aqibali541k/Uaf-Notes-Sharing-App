@@ -104,7 +104,7 @@ const Navbar = () => {
 
           {!isAuth ? (
             <Link to="/auth/login">
-              <Button className="w-full mt-2 text-white! bg-green-600! border-none! rounded-2xl! hover:bg-green-500! transition-all!">
+              <Button className="w-full mt-2 mb-2! text-white! bg-green-600! border-none! rounded-2xl! hover:bg-green-500! transition-all!">
                 Login
               </Button>
             </Link>

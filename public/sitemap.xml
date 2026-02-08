@@ -8,17 +8,17 @@
   <!-- NoteVault Sitemap -->
 
   <url>
-    <loc>https://notes-sharing-aqib.vercel.app/</loc>
+    <loc>https://uaf-notes-sharing-app.vercel.app/</loc>
     <lastmod>2026-01-29T00:00:00+00:00</lastmod>
   </url>
 
   <url>
-    <loc>https://notes-sharing-aqib.vercel.app/login</loc>
+    <loc>https://uaf-notes-sharing-app.vercel.app/login</loc>
     <lastmod>2026-01-29T00:00:00+00:00</lastmod>
   </url>
 
   <url>
-    <loc>https://notes-sharing-aqib.vercel.app/register</loc>
+    <loc>https://uaf-notes-sharing-app.vercel.app/register</loc>
     <lastmod>2026-01-29T00:00:00+00:00</lastmod>
   </url>
 

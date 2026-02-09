@@ -1,5 +1,5 @@
-import React from 'react';
-import '../../src/App.css'; // Make sure your loader CSS is here
+import React from "react";
+import "../../src/App.css"; // Make sure your loader CSS is here
 
 const ScreenLoader = () => {
   return (

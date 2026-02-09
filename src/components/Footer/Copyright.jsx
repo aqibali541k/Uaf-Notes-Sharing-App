@@ -35,7 +35,7 @@ const Copyright = () => {
   ];
 
   return (
-    <footer className=" bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white shadow-lg backdrop-blur-md w-full">
+    <footer className=" bg-linear-to-r from-indigo-600 via-purple-600 to-pink-500 text-white shadow-lg backdrop-blur-md w-full">
       <div className="  max-w-6xl mx-auto px-6 py-8 flex flex-col md:flex-row justify-between items-center gap-6">
         {/* About / Contact */}
         <div className="text-center md:text-left">

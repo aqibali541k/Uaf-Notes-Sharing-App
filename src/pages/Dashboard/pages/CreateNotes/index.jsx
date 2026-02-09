@@ -67,7 +67,7 @@ const CreateNotes = () => {
         ...s,
         sharedWith: checked
           ? [...s.sharedWith, id]
-          : s.sharedWith.filter((uid) => uid !== id),
+          : s.sharedWith.sw((uid) => uid !== id),
       }));
     } else {
       setState((s) => ({ ...s, [name]: value }));

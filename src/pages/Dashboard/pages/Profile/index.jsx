@@ -196,7 +196,7 @@ const Profile = () => {
             editMode={editMode}
             formData={formData}
             handleSelectChange={handleSelectChange}
-            options={["BSCS", "BSIT", "BBA", "BSSE", "BSAI", "Other"]}
+            options={["BSSE"]}
           />
           <Field
             label="Semester"
@@ -205,19 +205,21 @@ const Profile = () => {
             editMode={editMode}
             formData={formData}
             handleSelectChange={handleSelectChange}
-            options={["1", "2", "3", "4", "5", "6", "7", "8"]}
+            options={["4"]}
           />
           <Field
             label="Section"
             name="section"
+            type="select"
             editMode={editMode}
             formData={formData}
-            handleChange={handleChange}
+            handleSelectChange={handleSelectChange}
+            options={["A", "B"]}
           />
           <Field
             label="AG Number"
             name="agNo"
-            editMode={editMode}
+            // editMode={editMode}
             formData={formData}
             handleChange={handleChange}
           />

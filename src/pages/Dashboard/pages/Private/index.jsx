@@ -42,6 +42,7 @@ const Private = () => {
   const [currentNote, setCurrentNote] = useState(null);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [search, setSearch] = useState("");
+  const [downloadingId, setDownloadingId] = useState(null);
 
   // ---------------- FETCH NOTES ----------------
   const fetchNotes = async () => {
@@ -175,6 +176,36 @@ const Private = () => {
   const filteredUsers = users.filter((u) =>
     `${u.firstName} ${u.lastName}`.toLowerCase().includes(search.toLowerCase()),
   );
+  const handleDownload = async (note) => {
+    try {
+      setDownloadingId(note._id);
+
+      const response = await axios.get(note.pdfUrl, {
+        responseType: "blob", // ⭐ MOST IMPORTANT
+      });
+
+      const blob = new Blob([response.data], {
+        type: "application/pdf",
+      });
+
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${note.title || "note"}.pdf`;
+
+      document.body.appendChild(link);
+      link.click();
+
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(error);
+      message.error("PDF download failed");
+    } finally {
+      setDownloadingId(null);
+    }
+  };
 
   return (
     <div style={{ padding: "30px", minHeight: "100vh", background: "#f4f7ff" }}>
@@ -263,17 +294,13 @@ const Private = () => {
                   <Button
                     type="primary"
                     icon={<DownloadOutlined />}
-                    onClick={() => {
-                      const link = document.createElement("a");
-                      link.href = note.pdfUrl;
-                      link.download = note.title
-                        ? `${note.title}.pdf`
-                        : "note.pdf";
-                      link.click();
-                    }}
+                    loading={downloadingId === note._id}
+                    onClick={() => handleDownload(note)}
                     className="bg-blue-600! text-white!"
                   >
-                    Download
+                    {downloadingId === note._id
+                      ? "Downloading..."
+                      : "Download PDF"}
                   </Button>
 
                   {/* EDIT */}
@@ -321,7 +348,7 @@ const Private = () => {
         okText="Share"
         title="Share Note"
         width={420}
-        bodyStyle={{ padding: "16px" }}
+        style={{ padding: "16px" }}
       >
         <Input
           prefix={<SearchOutlined />}

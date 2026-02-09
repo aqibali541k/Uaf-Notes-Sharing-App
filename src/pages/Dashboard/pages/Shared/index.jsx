@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { message, Modal, Avatar, Tooltip } from "antd";
+import { message, Modal, Avatar, Tooltip, Button, Spin } from "antd";
 import {
   ShareAltOutlined,
   DeleteFilled,
-  EditOutlined,
   FilePdfOutlined,
+  DownloadOutlined,
 } from "@ant-design/icons";
 import SearchBar from "../SearchBar";
 import { useAuthContext } from "../../../../context/AuthContext";
@@ -16,17 +16,17 @@ const Shared = () => {
   const [notes, setNotes] = useState([]);
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  // Edit
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [activeNote, setActiveNote] = useState(null);
-  const [formData, setFormData] = useState({ title: "", file: null });
-
-  // Share
+  // Share modal
   const [isShareOpen, setIsShareOpen] = useState(false);
+  const [activeNote, setActiveNote] = useState(null);
   const [selectedUsers, setSelectedUsers] = useState([]);
 
-  // Fetch notes
+  // Download loader
+  const [downloadingId, setDownloadingId] = useState(null);
+
+  // ================= FETCH SHARED NOTES =================
   useEffect(() => {
     const fetchNotes = async () => {
       try {
@@ -37,12 +37,14 @@ const Shared = () => {
         setNotes(res.data.notes || []);
       } catch {
         message.error("Failed to load notes");
+      } finally {
+        setLoading(false);
       }
     };
     fetchNotes();
   }, [token]);
 
-  // Fetch users
+  // ================= FETCH USERS =================
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -58,14 +60,12 @@ const Shared = () => {
     fetchUsers();
   }, [token, user._id]);
 
-  // Delete note
+  // ================= DELETE NOTE =================
   const deleteNote = async (id) => {
     try {
       await axios.delete(
         `${import.meta.env.VITE_API_URL}/notes/sharedD/${id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       setNotes((prev) => prev.filter((n) => n._id !== id));
       message.success("Note deleted");
@@ -74,7 +74,7 @@ const Shared = () => {
     }
   };
 
-  // Share note
+  // ================= SHARE NOTE =================
   const shareNote = async () => {
     if (!selectedUsers.length) {
       message.warning("Select at least one user");
@@ -98,63 +98,119 @@ const Shared = () => {
     }
   };
 
-  const filteredNotes = notes.filter((n) =>
-    n.title?.toLowerCase().includes((searchTerm || "").toLowerCase()),
-  );
+  // ================= DOWNLOAD PDF (BLOB SAFE) =================
+  const handleDownload = async (pdfUrl, title, id) => {
+    try {
+      setDownloadingId(id);
 
+      const response = await axios.get(pdfUrl, {
+        responseType: "blob",
+      });
+
+      const blob = new Blob([response.data], {
+        type: "application/pdf",
+      });
+
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = `${title}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(link.href);
+    } catch {
+      message.error("Failed to download PDF");
+    } finally {
+      setDownloadingId(null);
+    }
+  };
+
+  // ================= SEARCH FILTER =================
+  const filteredNotes = notes.filter((n) =>
+    n.title?.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+        <Spin size="large" />
+        <p className="text-gray-500 tracking-wide">Loading shared notes...</p>
+      </div>
+    );
+  }
   return (
     <div className="mt-8 px-5">
       {notes.length > 0 && (
         <SearchBar onSearch={(v) => setSearchTerm(String(v))} />
       )}
+
       {notes.length === 0 && (
-        <p className="text-center text-gray-500">No notes found</p>
+        <p className="text-center text-gray-500 mt-20">No notes found</p>
       )}
 
-      {/* Notes grid */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+      {/* ================= NOTES GRID ================= */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
         {filteredNotes.map((note) => (
           <div
             key={note._id}
-            className="bg-white rounded-2xl shadow-lg p-5 flex flex-col justify-between hover:shadow-2xl transition"
+            className="
+              relative overflow-hidden
+              bg-linear-to-br from-[#faf7f2] via-white to-[#f5efe6]
+              border border-gray-200
+              rounded-3xl p-6
+              shadow-[0_20px_40px_rgba(0,0,0,0.08)]
+              hover:shadow-[0_30px_60px_rgba(0,0,0,0.15)]
+              transition-all duration-500
+              hover:-translate-y-2
+              group
+            "
           >
+            {/* Top antique line */}
+
+            <div className="absolute top-0 left-0 w-full h-[3px] bg-linear-to-r from-amber-500 via-rose-500 to-purple-600" />
+
+            {/* Glow */}
+            <div className="absolute -top-24 -right-24 w-48 h-48 bg-purple-300/20 rounded-full blur-3xl group-hover:scale-125 transition" />
+
+            {/* Title */}
             <div className="flex items-center gap-3 mb-4">
-              <FilePdfOutlined className="text-red-500 text-3xl" />
-              <h2 className="text-lg font-semibold">{note.title}</h2>
+              <div className="p-3 rounded-2xl bg-red-100 shadow-inner">
+                <FilePdfOutlined className="text-red-600 text-2xl" />
+              </div>
+              <h2 className="text-lg font-bold text-gray-800 tracking-wide">
+                {note.title}
+              </h2>
             </div>
 
-            <p className="text-xs text-gray-400 mb-2">
+            {/* Author */}
+            <p className="text-xs text-gray-500 italic mb-4">
               Shared by{" "}
-              {note.user?.firstName && note.user?.lastName
-                ? `${note.user.firstName} ${note.user.lastName}`
-                : "Unknown"}
+              <span className="font-semibold text-gray-700">
+                {note.user?.firstName} {note.user?.lastName}
+              </span>
             </p>
 
-            <div className="flex flex-col gap-2">
-              <a
-                href={note.pdfUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline text-sm"
-              >
-                View / Download PDF
-              </a>
-            </div>
+            {/* Download Button */}
+            <Button
+              loading={downloadingId === note._id}
+              onClick={() => handleDownload(note.pdfUrl, note.title, note._id)}
+              className="
+                w-full!
+                flex! items-center! justify-center! gap-2!
+                bg-linear-to-r! from-indigo-600! to-purple-600!
+                hover:from-purple-600! hover:to-pink-600!
+                text-white! font-semibold!
+                rounded-2xl! py-3!
+                shadow-lg!
+                transition-all! duration-300!
+                hover:scale-[1.03]
+              "
+            >
+              <DownloadOutlined />
+              {downloadingId === note._id ? "Downloading..." : "Download PDF"}
+            </Button>
 
-            <div className="flex justify-end gap-2 mt-4">
-              <Tooltip title="Edit">
-                <button
-                  onClick={() => {
-                    setActiveNote(note);
-                    setFormData({ title: note.title, file: null });
-                    setIsEditOpen(true);
-                  }}
-                  className="bg-green-500 p-2 rounded-xl text-white"
-                >
-                  <EditOutlined />
-                </button>
-              </Tooltip>
-
+            {/* Actions */}
+            <div className="flex justify-end gap-3 mt-5">
               <Tooltip title="Share">
                 <button
                   onClick={() => {
@@ -162,18 +218,18 @@ const Shared = () => {
                     setSelectedUsers([]);
                     setIsShareOpen(true);
                   }}
-                  className="bg-indigo-500 p-2 rounded-xl text-white"
+                  className="p-3 rounded-2xl bg-purple-400 border-none cursor-pointer backdrop-blur border hover:bg-cyan-400 transition"
                 >
-                  <ShareAltOutlined />
+                  <ShareAltOutlined className="text-indigo-600" />
                 </button>
               </Tooltip>
 
               <Tooltip title="Delete">
                 <button
                   onClick={() => deleteNote(note._id)}
-                  className="bg-red-500 p-2 rounded-xl text-white"
+                  className="p-3 rounded-2xl bg-red-600 text-white border-none cursor-pointer backdrop-blur border hover:bg-red-700 transition"
                 >
-                  <DeleteFilled />
+                  <DeleteFilled className="text-white" />
                 </button>
               </Tooltip>
             </div>
@@ -181,59 +237,14 @@ const Shared = () => {
         ))}
       </div>
 
-      {/* Edit Modal */}
-      <Modal
-        title="Edit Note"
-        open={isEditOpen}
-        onCancel={() => setIsEditOpen(false)}
-        onOk={async () => {
-          try {
-            const form = new FormData();
-            form.append("title", formData.title);
-            if (formData.file) form.append("pdf", formData.file);
-
-            const res = await axios.put(
-              `${import.meta.env.VITE_API_URL}/notes/update/${activeNote._id}`,
-              form,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                  "Content-Type": "multipart/form-data",
-                },
-              },
-            );
-
-            setNotes((prev) =>
-              prev.map((n) => (n._id === activeNote._id ? res.data.note : n)),
-            );
-            message.success("Note updated");
-            setIsEditOpen(false);
-          } catch {
-            message.error("Update failed");
-          }
-        }}
-      >
-        <input
-          className="w-full border p-2 rounded mb-3"
-          value={formData.title}
-          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-        />
-        <input
-          type="file"
-          accept="application/pdf"
-          onChange={(e) =>
-            setFormData({ ...formData, file: e.target.files[0] })
-          }
-        />
-      </Modal>
-
-      {/* Share Modal */}
+      {/* ================= SHARE MODAL ================= */}
       <Modal
         open={isShareOpen}
         onCancel={() => setIsShareOpen(false)}
         footer={null}
       >
         <h3 className="text-center font-semibold mb-3">Share with</h3>
+
         <div className="max-h-64 overflow-y-auto">
           {users.map((u) => (
             <div
@@ -261,7 +272,7 @@ const Shared = () => {
 
         <button
           onClick={shareNote}
-          className="w-full mt-3 py-3 bg-indigo-600 text-white rounded-xl font-semibold"
+          className="w-full mt-4 py-3 bg-indigo-600 text-white rounded-xl font-semibold"
         >
           Share ({selectedUsers.length})
         </button>

@@ -24,6 +24,7 @@ const Public = () => {
   const [notes, setNotes] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
+  const [downloadingId, setDownloadingId] = useState(null);
 
   // ================= FETCH PUBLIC NOTES =================
   useEffect(() => {
@@ -68,6 +69,36 @@ const Public = () => {
       category: cat,
       notes: notesArr.filter((note) => note.category === cat),
     }));
+  const handleDownload = async (note) => {
+    try {
+      setDownloadingId(note._id);
+
+      const response = await axios.get(note.pdfUrl, {
+        responseType: "blob", // ⭐ MOST IMPORTANT
+      });
+
+      const blob = new Blob([response.data], {
+        type: "application/pdf",
+      });
+
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${note.title || "note"}.pdf`;
+
+      document.body.appendChild(link);
+      link.click();
+
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(error);
+      message.error("PDF download failed");
+    } finally {
+      setDownloadingId(null);
+    }
+  };
 
   // ================= NOTE CARD =================
   const renderNoteCard = (note) => (
@@ -86,15 +117,11 @@ const Public = () => {
         <Button
           type="primary"
           icon={<DownloadOutlined />}
+          loading={downloadingId === note._id}
+          onClick={() => handleDownload(note)}
           className="bg-linear-to-r from-purple-500 to-pink-500 border-none text-white"
-          onClick={() => {
-            const link = document.createElement("a");
-            link.href = note.pdfUrl;
-            link.download = `${note.title}.pdf`;
-            link.click();
-          }}
         >
-          Download
+          {downloadingId === note._id ? "Downloading..." : "Download PDF"}
         </Button>
       </div>
 

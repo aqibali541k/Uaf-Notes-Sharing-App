@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Table, Avatar, Button, message, Popconfirm, Spin } from "antd";
+import {
+  Table,
+  Avatar,
+  Button,
+  message,
+  Popconfirm,
+  Spin,
+  Card,
+  Tag,
+  Grid,
+} from "antd";
 import {
   UserOutlined,
   DeleteOutlined,
@@ -9,10 +19,14 @@ import {
 import axios from "axios";
 import { useAuthContext } from "../../../../context/AuthContext";
 
+const { useBreakpoint } = Grid;
+
 const AllStudents = () => {
   const { token, user } = useAuthContext();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
 
   // ================= ADMIN VALIDATION =================
   useEffect(() => {
@@ -30,7 +44,6 @@ const AllStudents = () => {
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/users/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      // Filter only students
       setUsers(res.data.users.filter((u) => u.role === "student"));
     } catch (err) {
       console.error(err);
@@ -63,6 +76,7 @@ const AllStudents = () => {
     }
   };
 
+  // ================= DELETE USER =================
   const deleteUser = async (id) => {
     try {
       setLoading(true);
@@ -79,60 +93,39 @@ const AllStudents = () => {
     }
   };
 
-  // ================= TABLE COLUMNS =================
+  // ================= TABLE COLUMNS (DESKTOP) =================
   const columns = [
     {
       title: "Avatar",
       dataIndex: "image",
-      key: "image",
       render: (img) => <Avatar src={img} icon={<UserOutlined />} />,
       width: 80,
     },
-    {
-      title: "Name",
-      dataIndex: "fullName",
-      key: "fullName",
-      responsive: ["sm"],
-    },
-    { title: "Email", dataIndex: "email", key: "email", responsive: ["md"] },
-    { title: "Degree", dataIndex: "degree", key: "degree", responsive: ["lg"] },
-    {
-      title: "Semester",
-      dataIndex: "semester",
-      key: "semester",
-      responsive: ["lg"],
-    },
-    {
-      title: "Section",
-      dataIndex: "section",
-      key: "section",
-      responsive: ["lg"],
-    },
-    { title: "AG No", dataIndex: "agNo", key: "agNo", responsive: ["md"] },
+    { title: "Name", dataIndex: "fullName" },
+    { title: "Email", dataIndex: "email" },
+    { title: "Degree", dataIndex: "degree" },
+    { title: "Semester", dataIndex: "semester" },
+    { title: "Section", dataIndex: "section" },
+    { title: "AG No", dataIndex: "agNo" },
     {
       title: "Status",
-      key: "status",
-      render: (_, record) => (
-        <span className={record.isBlocked ? "text-red-500" : "text-green-600"}>
-          {record.isBlocked ? "Blocked" : "Active"}
-        </span>
+      render: (_, r) => (
+        <Tag color={r.isBlocked ? "red" : "green"}>
+          {r.isBlocked ? "Blocked" : "Active"}
+        </Tag>
       ),
-      responsive: ["sm"],
     },
     {
       title: "Actions",
-      key: "actions",
-      render: (_, record) => (
+      render: (_, r) => (
         <div className="flex gap-2">
           <Button
-            icon={record.isBlocked ? <CheckOutlined /> : <StopOutlined />}
-            onClick={() => toggleBlock(record._id, record.isBlocked)}
+            icon={r.isBlocked ? <CheckOutlined /> : <StopOutlined />}
+            onClick={() => toggleBlock(r._id, r.isBlocked)}
           />
           <Popconfirm
-            title="Are you sure to delete this user?"
-            onConfirm={() => deleteUser(record._id)}
-            okText="Yes"
-            cancelText="No"
+            title="Delete this student?"
+            onConfirm={() => deleteUser(r._id)}
           >
             <Button danger icon={<DeleteOutlined />} />
           </Popconfirm>
@@ -141,6 +134,51 @@ const AllStudents = () => {
     },
   ];
 
+  // ================= MOBILE CARD =================
+  const StudentCard = ({ s }) => (
+    <Card className="mb-3 rounded-xl shadow-sm">
+      <div className="flex gap-3">
+        <Avatar size={50} src={s.image} icon={<UserOutlined />} />
+
+        <div className="flex-1">
+          <h3 className="font-semibold">{s.fullName}</h3>
+          <p className="text-xs text-gray-500">{s.email}</p>
+
+          <div className="flex flex-wrap gap-1 mt-2">
+            <Tag>{s.degree}</Tag>
+            <Tag>Sem {s.semester}</Tag>
+            <Tag>Sec {s.section}</Tag>
+            <Tag>AG {s.agNo}</Tag>
+          </div>
+
+          <Tag className="mt-2" color={s.isBlocked ? "red" : "green"}>
+            {s.isBlocked ? "Blocked" : "Active"}
+          </Tag>
+
+          <div className="flex gap-2 mt-3">
+            <Button
+              size="small"
+              icon={s.isBlocked ? <CheckOutlined /> : <StopOutlined />}
+              onClick={() => toggleBlock(s._id, s.isBlocked)}
+            >
+              {s.isBlocked ? "Unblock" : "Block"}
+            </Button>
+
+            <Popconfirm
+              title="Delete this student?"
+              onConfirm={() => deleteUser(s._id)}
+            >
+              <Button size="small" danger icon={<DeleteOutlined />}>
+                Delete
+              </Button>
+            </Popconfirm>
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+
+  // ================= ACCESS DENIED =================
   if (!user || user.role !== "admin") {
     return (
       <div className="min-h-screen flex items-center justify-center text-red-500 font-bold">
@@ -149,6 +187,7 @@ const AllStudents = () => {
     );
   }
 
+  // ================= RENDER =================
   return (
     <div className="p-4 min-h-screen bg-gray-100 relative">
       {loading && (
@@ -156,15 +195,24 @@ const AllStudents = () => {
           <Spin size="large" />
         </div>
       )}
+
       <h2 className="text-2xl font-bold mb-4">All Students</h2>
-      <Table
-        columns={columns}
-        dataSource={users}
-        rowKey="_id"
-        bordered
-        pagination={{ pageSize: 10 }}
-        scroll={{ x: 900 }}
-      />
+
+      {isMobile ? (
+        users.length ? (
+          users.map((s) => <StudentCard key={s._id} s={s} />)
+        ) : (
+          <p className="text-center text-gray-500">No students found</p>
+        )
+      ) : (
+        <Table
+          columns={columns}
+          dataSource={users}
+          rowKey="_id"
+          bordered
+          pagination={{ pageSize: 10 }}
+        />
+      )}
     </div>
   );
 };

@@ -10,12 +10,12 @@ import {
 import { useAuthContext } from "../../../context/AuthContext";
 
 const categories = [
-  "Stat-412",
+  "Statistics",
   "Cs-412",
-  "Cs-410",
-  "Cs-408",
-  "Cs-406",
-  "Bms-402",
+  "Database",
+  "Dsa",
+  "Virtual Programming",
+  "Enterpreneurship",
   "Announcements",
 ];
 

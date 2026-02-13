@@ -65,7 +65,7 @@ const Sider = () => {
   return (
     <div
       className={`fixed! top-0 bottom-0 left-0 z-50 text-white shadow-lg
-        bg-gradient-to-br! from-blue-600 to-blue-400 transition-all duration-300
+        bg-linear-to-br! from-blue-600 to-blue-400 transition-all duration-300
         ${isSiderOpen ? "w-60" : "w-16"}`}
     >
       {/* TOP */}

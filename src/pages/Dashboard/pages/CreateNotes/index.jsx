@@ -21,6 +21,7 @@ const CreateNotes = () => {
   const { token } = useAuthContext();
   const location = useLocation();
   const noteToEdit = location.state?.noteToEdit;
+  const [loading, setLoading] = useState(false);
 
   const [state, setState] = useState(initialState);
   const [users, setUsers] = useState([]);
@@ -99,6 +100,7 @@ const CreateNotes = () => {
     if (state.file) fd.append("pdf", state.file);
 
     try {
+      setLoading(true);
       if (noteToEdit) {
         await axios.put(
           `${import.meta.env.VITE_API_URL}/notes/update/${noteToEdit._id}`,
@@ -115,6 +117,8 @@ const CreateNotes = () => {
       setState(initialState);
     } catch (err) {
       message.error(err.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -160,12 +164,13 @@ const CreateNotes = () => {
                 className="w-full rounded-lg text-gray-900"
               >
                 <Option value="">Select subject</Option>
-                <Option value="Statistics">Statistics</Option>
+                <Option value="Stat-402">Stat-402</Option>
+                <Option value="Cs-408">Cs-408</Option>
                 <Option value="Cs-412">Cs-412</Option>
-                <Option value="Database">Database</Option>
-                <Option value="Dsa">Dsa</Option>
-                <Option value="Virtual Programming">Virtual Programming</Option>
-                <Option value="Enterpreneurship">Enterpreneurship</Option>
+                <Option value="Cs-410">Cs-410</Option>
+                <Option value="Cs-406">Cs-406</Option>
+                <Option value="Bms-402">Bms-402</Option>
+                <Option value="Is-402">Is-402</Option>
                 <Option value="Announcements">Announcements</Option>
               </Select>
             </div>
@@ -208,6 +213,7 @@ const CreateNotes = () => {
           type="primary"
           size="large"
           className="w-full mt-6 md:mt-8 rounded-xl text-lg"
+          loading={loading}
           onClick={handleSubmit}
         >
           {noteToEdit ? "Update Note " : "Create Note "}

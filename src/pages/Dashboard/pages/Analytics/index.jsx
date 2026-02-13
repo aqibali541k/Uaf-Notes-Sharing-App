@@ -78,7 +78,7 @@ const Analytics = () => {
   }
 
   return (
-    <div className="min-h-screen p-6 bg-gradient-to-br from-blue-50 via-white to-yellow-50">
+    <div className="min-h-screen p-6 bg-linear-to-br from-blue-50 via-white to-yellow-50">
       <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
         📊 Notes Analytics
       </h1>

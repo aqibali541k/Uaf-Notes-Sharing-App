@@ -1,3 +1,4 @@
+// src/components/Admin/Analytics.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
@@ -13,66 +14,71 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useAuthContext } from "../../../../context/AuthContext";
-import { Spin } from "antd";
+import { Spin, Select } from "antd";
+
+const { Option } = Select;
 
 const Analytics = () => {
-  const { token } = useAuthContext();
+  const { token, user } = useAuthContext();
   const [loading, setLoading] = useState(true);
   const [pieData, setPieData] = useState([]);
   const [barData, setBarData] = useState([]);
 
   const COLORS = ["#2563eb", "#22c55e", "#facc15", "#ef4444"];
 
-  useEffect(() => {
-    const fetchAnalytics = async () => {
-      try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/notes/analytics`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
+  const fetchAnalytics = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/notes/analytics`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-        );
+        },
+      );
 
-        const {
-          totalCreated,
-          sharedNotes,
-          privateNotes,
-          publicNotes,
-          monthlyData,
-        } = res.data;
+      const {
+        totalCreated,
+        sharedNotes,
+        privateNotes,
+        publicNotes,
+        monthlyData,
+      } = res.data;
 
-        setPieData([
-          { name: "Created", value: totalCreated },
-          { name: "Shared", value: sharedNotes },
-          { name: "Private", value: privateNotes },
-          { name: "Public", value: publicNotes },
-        ]);
+      // Pie chart
+      setPieData([
+        { name: "Created", value: totalCreated },
+        { name: "Shared", value: sharedNotes },
+        { name: "Private", value: privateNotes },
+        { name: "Public", value: publicNotes },
+      ]);
 
-        setBarData(
-          monthlyData.map((item) => ({
-            name: item.month,
-            Created: item.created,
-            Shared: item.shared,
-            Private: item.private,
-            Public: item.public,
-          })),
-        );
-      } catch (error) {
-        console.error("Error fetching analytics:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+      // Bar chart
+      setBarData(
+        monthlyData.map((item) => ({
+          name: item.month,
+          Created: item.created,
+          Shared: item.shared,
+          Private: item.private,
+          Public: item.public,
+        })),
+      );
+    } catch (error) {
+      console.error("Error fetching analytics:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchAnalytics();
   }, [token]);
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-lg font-semibold text-gray-600 animate-pulse">
-          <Spin size="large" />
-        </p>
+        <Spin size="large" />
       </div>
     );
   }
@@ -82,6 +88,15 @@ const Analytics = () => {
       <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
         📊 Notes Analytics
       </h1>
+
+      {/* Admin Toggle */}
+      {user.role === "admin" && (
+        <div className="max-w-md mx-auto mb-6 text-center">
+          <Select value={"self"} className="w-60">
+            <Option value="self">My Analytics</Option>
+          </Select>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
         {/* Pie Chart */}
@@ -99,6 +114,9 @@ const Analytics = () => {
                   labelLine={false}
                   outerRadius="80%"
                   dataKey="value"
+                  label={({ name, percent }) =>
+                    `${name} ${(percent * 100).toFixed(0)}%`
+                  }
                 >
                   {pieData.map((entry, index) => (
                     <Cell

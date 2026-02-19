@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import SearchBar from "../../Dashboard/pages/SearchBar";
-import { Tag, Spin, Button } from "antd";
+import { Tag, Spin, Button, message } from "antd";
 import {
   UserOutlined,
   FilePdfOutlined,
@@ -73,29 +73,20 @@ const Public = () => {
   const handleDownload = async (note) => {
     try {
       setDownloadingId(note._id);
-
-      const response = await axios.get(note.pdfUrl, {
-        responseType: "blob", // ⭐ MOST IMPORTANT
-      });
-
+      const response = await axios.get(note.fileUrl, { responseType: "blob" });
       const blob = new Blob([response.data], {
-        type: "application/pdf",
+        type: note.fileType || response.data.type,
       });
-
       const url = window.URL.createObjectURL(blob);
-
       const link = document.createElement("a");
       link.href = url;
-      link.download = `${note.title || "note"}.pdf`;
-
+      link.download = `${note.title || "note"}.${note.fileExt || note.fileUrl.split(".").pop()}`;
       document.body.appendChild(link);
       link.click();
-
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error(error);
-      message.error("PDF download failed");
+    } catch {
+      message.error("Download failed");
     } finally {
       setDownloadingId(null);
     }

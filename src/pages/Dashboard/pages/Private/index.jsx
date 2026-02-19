@@ -179,29 +179,20 @@ const Private = () => {
   const handleDownload = async (note) => {
     try {
       setDownloadingId(note._id);
-
-      const response = await axios.get(note.pdfUrl, {
-        responseType: "blob", // ⭐ MOST IMPORTANT
-      });
-
+      const response = await axios.get(note.fileUrl, { responseType: "blob" });
       const blob = new Blob([response.data], {
-        type: "application/pdf",
+        type: note.fileType || response.data.type,
       });
-
       const url = window.URL.createObjectURL(blob);
-
       const link = document.createElement("a");
       link.href = url;
-      link.download = `${note.title || "note"}.pdf`;
-
+      link.download = `${note.title || "note"}.${note.fileExt || note.fileUrl.split(".").pop()}`;
       document.body.appendChild(link);
       link.click();
-
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error(error);
-      message.error("PDF download failed");
+    } catch {
+      message.error("Download failed");
     } finally {
       setDownloadingId(null);
     }
@@ -258,6 +249,7 @@ const Private = () => {
               <Card
                 hoverable
                 style={{
+                  maxWidth: "250px",
                   borderRadius: 16,
                   boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
                 }}
@@ -271,6 +263,7 @@ const Private = () => {
                       justifyContent: "center",
                       borderTopLeftRadius: 16,
                       borderTopRightRadius: 16,
+                      maxWidth: "250px",
                     }}
                   >
                     <FilePdfOutlined style={{ fontSize: 50, color: "#fff" }} />
@@ -297,20 +290,14 @@ const Private = () => {
                     loading={downloadingId === note._id}
                     onClick={() => handleDownload(note)}
                     className="bg-blue-600! text-white!"
-                  >
-                    {downloadingId === note._id
-                      ? "Downloading..."
-                      : "Download PDF"}
-                  </Button>
+                  ></Button>
 
                   {/* EDIT */}
                   <Button
                     icon={<EditOutlined />}
                     onClick={() => handleEdit(note)}
                     className="bg-blue-600! text-white!"
-                  >
-                    Edit
-                  </Button>
+                  ></Button>
                   <Button
                     icon={<DeleteOutlined />}
                     onClick={() => handleDelete(note)}
@@ -330,9 +317,7 @@ const Private = () => {
                     icon={<ShareAltOutlined />}
                     onClick={() => handleShare(note)}
                     className="bg-blue-600! text-white!"
-                  >
-                    Share
-                  </Button>
+                  ></Button>
                 </div>
               </Card>
             </Col>

@@ -5,7 +5,14 @@ import {
   ShareAltOutlined,
   DeleteFilled,
   FilePdfOutlined,
+  FileImageOutlined,
+  FileTextOutlined,
+  FileZipOutlined,
+  FileWordOutlined,
+  FileExcelOutlined,
+  FileUnknownOutlined,
   DownloadOutlined,
+  // FileVideoOutlined,
 } from "@ant-design/icons";
 import SearchBar from "../SearchBar";
 import { useAuthContext } from "../../../../context/AuthContext";
@@ -35,7 +42,8 @@ const Shared = () => {
           { headers: { Authorization: `Bearer ${token}` } },
         );
         setNotes(res.data.notes || []);
-      } catch {
+      } catch (err) {
+        console.error(err);
         message.error("Failed to load notes");
       } finally {
         setLoading(false);
@@ -53,7 +61,8 @@ const Shared = () => {
           { headers: { Authorization: `Bearer ${token}` } },
         );
         setUsers(res.data.users.filter((u) => u._id !== user._id));
-      } catch {
+      } catch (err) {
+        console.error(err);
         message.error("Failed to load users");
       }
     };
@@ -69,8 +78,9 @@ const Shared = () => {
       );
       setNotes((prev) => prev.filter((n) => n._id !== id));
       message.success("Note deleted");
-    } catch {
-      message.error("You are not allowed to delete this note");
+    } catch (err) {
+      console.error(err);
+      message.error("something went wrong while deleting note");
     }
   };
 
@@ -90,45 +100,66 @@ const Shared = () => {
       setNotes((prev) =>
         prev.map((n) => (n._id === activeNote._id ? res.data.note : n)),
       );
-      message.success("Note shared");
+      message.success("Note shared successfully");
       setSelectedUsers([]);
       setIsShareOpen(false);
-    } catch {
-      message.error("You are not allowed to share this note");
+    } catch (err) {
+      console.error(err);
+      message.info("You are not allowed to share this note");
     }
   };
 
-  // ================= DOWNLOAD PDF (BLOB SAFE) =================
-  const handleDownload = async (pdfUrl, title, id) => {
+  // ================= DOWNLOAD NOTE =================
+  const handleDownload = async (note) => {
     try {
-      setDownloadingId(id);
-
-      const response = await axios.get(pdfUrl, {
-        responseType: "blob",
-      });
-
+      setDownloadingId(note._id);
+      const response = await axios.get(note.fileUrl, { responseType: "blob" });
       const blob = new Blob([response.data], {
-        type: "application/pdf",
+        type: note.fileType || response.data.type,
       });
-
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
-      link.href = window.URL.createObjectURL(blob);
-      link.download = `${title}.pdf`;
+      link.href = url;
+      link.download = `${note.title || "note"}.${
+        note.fileExt || note.fileUrl.split(".").pop()
+      }`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      window.URL.revokeObjectURL(link.href);
+      window.URL.revokeObjectURL(url);
     } catch {
-      message.error("Failed to download PDF");
+      message.error("Download failed");
     } finally {
       setDownloadingId(null);
     }
   };
 
-  // ================= SEARCH FILTER =================
+  // ================= FILTER NOTES =================
   const filteredNotes = notes.filter((n) =>
     n.title?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
+
+  // ================= GET ICON =================
+  const getFileIcon = (type) => {
+    if (!type)
+      return <FileUnknownOutlined className="text-gray-600 text-2xl" />;
+
+    if (type.includes("pdf"))
+      return <FilePdfOutlined className="text-red-600 text-2xl" />;
+    if (type.includes("image"))
+      return <FileImageOutlined className="text-green-600 text-2xl" />;
+    if (type.includes("video"))
+      return <FileVideoOutlined className="text-purple-600 text-2xl" />;
+    if (type.includes("zip") || type.includes("rar"))
+      return <FileZipOutlined className="text-yellow-600 text-2xl" />;
+    if (type.includes("word") || type.includes("doc"))
+      return <FileWordOutlined className="text-blue-600 text-2xl" />;
+    if (type.includes("excel") || type.includes("sheet"))
+      return <FileExcelOutlined className="text-green-700 text-2xl" />;
+
+    return <FileTextOutlined className="text-gray-500 text-2xl" />;
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
@@ -137,14 +168,18 @@ const Shared = () => {
       </div>
     );
   }
+
   return (
-    <div className="mt-8 px-5">
+    <div className="mt-8 px-5 max-w-7xl mx-auto">
+      {/* SEARCH BAR */}
       {notes.length > 0 && (
         <SearchBar onSearch={(v) => setSearchTerm(String(v))} />
       )}
 
       {notes.length === 0 && (
-        <p className="text-center text-gray-500 mt-20">No notes found</p>
+        <p className="text-center text-gray-500 mt-20 text-lg">
+          No shared notes available
+        </p>
       )}
 
       {/* ================= NOTES GRID ================= */}
@@ -154,32 +189,36 @@ const Shared = () => {
             key={note._id}
             className="
               relative overflow-hidden
-              bg-linear-to-br from-[#faf7f2] via-white to-[#f5efe6]
+              bg-gradient-to-br from-[#faf7f2] via-white to-[#f5efe6]
               border border-gray-200
               rounded-3xl p-6
-              shadow-[0_20px_40px_rgba(0,0,0,0.08)]
-              hover:shadow-[0_30px_60px_rgba(0,0,0,0.15)]
-              transition-all duration-500
+              shadow-lg
+              hover:shadow-2xl
+              transition-transform duration-300
               hover:-translate-y-2
               group
             "
           >
-            {/* Top antique line */}
+            {/* Top gradient line */}
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 rounded-t-xl" />
 
-            <div className="absolute top-0 left-0 w-full h-[3px] bg-linear-to-r from-amber-500 via-rose-500 to-purple-600" />
+            {/* Glow effect */}
+            <div className="absolute -top-24 -right-24 w-48 h-48 bg-purple-300/20 rounded-full blur-3xl group-hover:scale-125 transition-transform" />
 
-            {/* Glow */}
-            <div className="absolute -top-24 -right-24 w-48 h-48 bg-purple-300/20 rounded-full blur-3xl group-hover:scale-125 transition" />
-
-            {/* Title */}
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-3 rounded-2xl bg-red-100 shadow-inner">
-                <FilePdfOutlined className="text-red-600 text-2xl" />
+            {/* Title & Icon */}
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-3 rounded-2xl bg-gray-100 shadow-inner">
+                {getFileIcon(note.fileType)}
               </div>
-              <h2 className="text-lg font-bold text-gray-800 tracking-wide">
+              <h2 className="text-lg font-bold text-gray-800 tracking-wide truncate">
                 {note.title}
               </h2>
             </div>
+
+            {/* File type */}
+            <p className="text-xs text-gray-400 mb-4">
+              Type: {note.fileExt?.toUpperCase() || "Unknown"}
+            </p>
 
             {/* Author */}
             <p className="text-xs text-gray-500 italic mb-4">
@@ -189,24 +228,24 @@ const Shared = () => {
               </span>
             </p>
 
-            {/* Download Button */}
+            {/* Download button */}
             <Button
               loading={downloadingId === note._id}
-              onClick={() => handleDownload(note.pdfUrl, note.title, note._id)}
+              onClick={() => handleDownload(note)}
               className="
-                w-full!
-                flex! items-center! justify-center! gap-2!
-                bg-linear-to-r! from-indigo-600! to-purple-600!
-                hover:from-purple-600! hover:to-pink-600!
-                text-white! font-semibold!
-                rounded-2xl! py-3!
-                shadow-lg!
-                transition-all! duration-300!
-                hover:scale-[1.03]
+                w-full flex items-center justify-center gap-2
+                bg-gradient-to-r from-indigo-600 to-purple-600
+                hover:from-purple-600 hover:to-pink-600
+                text-white font-semibold
+                rounded-2xl py-3
+                shadow-lg
+                transition-all duration-300 hover:scale-[1.03]
               "
             >
               <DownloadOutlined />
-              {downloadingId === note._id ? "Downloading..." : "Download PDF"}
+              {downloadingId === note._id
+                ? "Downloading..."
+                : `Download ${note.fileExt?.toUpperCase() || "File"}`}
             </Button>
 
             {/* Actions */}
@@ -215,21 +254,21 @@ const Shared = () => {
                 <button
                   onClick={() => {
                     setActiveNote(note);
-                    setSelectedUsers([]);
+                    setSelectedUsers(note.sharedWith?.map((u) => u._id) || []);
                     setIsShareOpen(true);
                   }}
-                  className="p-3 rounded-2xl bg-purple-400 border-none cursor-pointer backdrop-blur border hover:bg-cyan-400 transition"
+                  className="p-3 rounded-2xl bg-purple-400 hover:bg-cyan-400 transition text-white"
                 >
-                  <ShareAltOutlined className="text-indigo-600" />
+                  <ShareAltOutlined />
                 </button>
               </Tooltip>
 
               <Tooltip title="Delete">
                 <button
                   onClick={() => deleteNote(note._id)}
-                  className="p-3 rounded-2xl bg-red-600 text-white border-none cursor-pointer backdrop-blur border hover:bg-red-700 transition"
+                  className="p-3 rounded-2xl bg-red-600 hover:bg-red-700 text-white transition"
                 >
-                  <DeleteFilled className="text-white" />
+                  <DeleteFilled />
                 </button>
               </Tooltip>
             </div>
@@ -242,10 +281,10 @@ const Shared = () => {
         open={isShareOpen}
         onCancel={() => setIsShareOpen(false)}
         footer={null}
+        title="Share Note"
+        centered
       >
-        <h3 className="text-center font-semibold mb-3">Share with</h3>
-
-        <div className="max-h-64 overflow-y-auto">
+        <div className="flex flex-col gap-2">
           {users.map((u) => (
             <div
               key={u._id}
@@ -256,7 +295,7 @@ const Shared = () => {
                     : [...prev, u._id],
                 )
               }
-              className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer ${
+              className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition ${
                 selectedUsers.includes(u._id)
                   ? "bg-indigo-100"
                   : "hover:bg-gray-100"
@@ -270,12 +309,13 @@ const Shared = () => {
           ))}
         </div>
 
-        <button
+        <Button
+          type="primary"
           onClick={shareNote}
-          className="w-full mt-4 py-3 bg-indigo-600 text-white rounded-xl font-semibold"
+          className="w-full mt-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl"
         >
           Share ({selectedUsers.length})
-        </button>
+        </Button>
       </Modal>
     </div>
   );

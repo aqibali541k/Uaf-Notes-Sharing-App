@@ -136,7 +136,7 @@ const AllStudents = () => {
 
   // ================= MOBILE CARD =================
   const StudentCard = ({ s }) => (
-    <Card className="mb-3 rounded-xl shadow-sm">
+    <Card className="mb-3 rounded-xl shadow-sm" style={{ maxWidth: "250px" }}>
       <div className="flex gap-3">
         <Avatar size={50} src={s.image} icon={<UserOutlined />} />
 

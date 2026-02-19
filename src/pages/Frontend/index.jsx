@@ -11,14 +11,12 @@ const Frontend = () => {
     <main className="min-h-screen flex flex-col">
       <Header />
 
-      {/* Main content grows to fill remaining space */}
       <div className="grow">
         <Routes>
           <Route path="/" element={<Public />} />
         </Routes>
       </div>
 
-      {/* Footer */}
       <Footer />
     </main>
   );

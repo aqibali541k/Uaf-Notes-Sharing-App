@@ -29,7 +29,7 @@ const Copyright = () => {
     },
     {
       icon: <LinkedinOutlined />,
-      url: "https://linkedin.com/in/AqibShabbir",
+      url: "https://www.linkedin.com/in/aqib-shabbir-62a16a345",
       color: "hover:text-blue-500",
     },
   ];

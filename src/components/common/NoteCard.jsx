@@ -39,7 +39,7 @@ const NoteCard = ({ note, onDownload, downloadingId, extraActions }) => {
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 flex items-center justify-center bg-gray-50 rounded-2xl group-hover:scale-110 transition-transform duration-300 shadow-inner">
             <span className="text-2xl flex items-center justify-center">
-               {getFileIcon(note.fileType || note.fileExt)}
+              {getFileIcon(note.fileType || note.fileExt)}
             </span>
           </div>
           <div>
@@ -53,11 +53,11 @@ const NoteCard = ({ note, onDownload, downloadingId, extraActions }) => {
         </div>
         {note.isPrivate ? (
           <div className="p-2 bg-amber-50 rounded-lg">
-             <LockOutlined className="text-amber-500 flex" title="Private" />
+            <LockOutlined className="text-amber-500 flex" title="Private" />
           </div>
         ) : (
           <div className="p-2 bg-indigo-50 rounded-lg">
-             <ShareAltOutlined className="text-indigo-500 flex" title="Public" />
+            <ShareAltOutlined className="text-indigo-500 flex" title="Public" />
           </div>
         )}
       </div>
@@ -65,19 +65,19 @@ const NoteCard = ({ note, onDownload, downloadingId, extraActions }) => {
       {/* Info */}
       <div className="mb-6 space-y-3">
         <div className="flex items-center gap-2">
-           <Avatar size="small" src={note?.user?.image} icon={<UserOutlined />} className="bg-indigo-100" />
-           <span className="text-xs font-bold text-gray-600">
-             {note?.user?.firstName} {note?.user?.lastName}
-           </span>
+          <Avatar size="small" src={note?.user?.image} icon={<UserOutlined />} className="bg-indigo-100" />
+          <span className="text-xs font-bold text-gray-600">
+            {note?.user?.firstName} {note?.user?.lastName}
+          </span>
         </div>
-        
+
         <div className="flex items-center gap-2">
-           <Tag className="m-0 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 border-none bg-indigo-50 text-indigo-600 rounded-lg">
-              Section {note?.user?.section || "N/A"}
-           </Tag>
-           <Tag className="m-0 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 border-none bg-emerald-50 text-emerald-600 rounded-lg">
-              {note?.user?.semester || "4"}th Sem
-           </Tag>
+          <Tag className="m-0 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 border-none bg-indigo-50 text-indigo-600 rounded-lg">
+            Section {note?.user?.section || "N/A"}
+          </Tag>
+          <Tag className="m-0 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 border-none bg-emerald-50 text-emerald-600 rounded-lg">
+            {note?.user?.semester || "4"}th Sem
+          </Tag>
         </div>
       </div>
 
@@ -94,10 +94,10 @@ const NoteCard = ({ note, onDownload, downloadingId, extraActions }) => {
         >
           {isDownloading ? "Preparing..." : "Download Notes"}
         </Button>
-        
+
         {extraActions && (
           <div className="flex gap-2">
-             {extraActions}
+            {extraActions}
           </div>
         )}
       </div>

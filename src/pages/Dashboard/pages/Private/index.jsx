@@ -15,7 +15,6 @@ import {
   Avatar,
   Space,
   Tag,
-  NoteCard,
 } from "antd";
 import {
   UploadOutlined,
@@ -33,6 +32,7 @@ import {
 import { useAuthContext } from "../../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { API_URL } from "../../../../constants";
+import NoteCard from "../../../../components/common/NoteCard";
 
 const { Title, Text } = Typography;
 

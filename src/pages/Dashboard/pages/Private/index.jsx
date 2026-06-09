@@ -13,6 +13,7 @@ import {
   Spin,
   Input,
   Avatar,
+  Space,
 } from "antd";
 import {
   UploadOutlined,
@@ -311,8 +312,8 @@ const Private = () => {
                   )
                 }
                 className={`flex items-center gap-4 p-3 rounded-2xl cursor-pointer transition-all duration-300 border ${selectedUsers.includes(u._id)
-                    ? "bg-indigo-50 border-indigo-200 shadow-sm"
-                    : "bg-white border-gray-50 hover:bg-gray-50 hover:border-gray-100"
+                  ? "bg-indigo-50 border-indigo-200 shadow-sm"
+                  : "bg-white border-gray-50 hover:bg-gray-50 hover:border-gray-100"
                   }`}
               >
                 <Avatar size="large" src={u.image} className="bg-indigo-100 text-indigo-600 font-black">

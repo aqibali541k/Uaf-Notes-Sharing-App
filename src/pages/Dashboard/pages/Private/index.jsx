@@ -14,6 +14,8 @@ import {
   Input,
   Avatar,
   Space,
+  Tag,
+  NoteCard,
 } from "antd";
 import {
   UploadOutlined,

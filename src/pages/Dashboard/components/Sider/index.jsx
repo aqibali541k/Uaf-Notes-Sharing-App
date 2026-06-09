@@ -64,80 +64,85 @@ const Sider = () => {
 
   return (
     <div
-      className={`fixed! top-0 bottom-0 left-0 z-50 text-white shadow-lg
-        bg-linear-to-br! from-blue-600 to-blue-400 transition-all duration-300
-        ${isSiderOpen ? "w-60" : "w-16"}`}
+      className={`fixed top-0 bottom-0 left-0 z-50 text-white shadow-2xl
+        transition-all duration-300 ease-in-out border-r border-indigo-500/20
+        ${isSiderOpen ? "w-64" : "w-20"}`}
+      style={{ backgroundColor: '#1a1c2e' }} // Deep slate/indigo for premium look
     >
-      {/* TOP */}
-      <div className="flex items-center justify-between p-3 border-b border-white/20">
-        {/* TOGGLE */}
+      {/* BRANDING / TOGGLE */}
+      <div className="flex items-center h-20 px-4 border-b border-white/5">
+        <div className={`flex items-center gap-3 overflow-hidden transition-all duration-300 ${isSiderOpen ? "opacity-100" : "opacity-0 w-0"}`}>
+          <div className="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center shrink-0">
+            <HomeFilled className="text-white text-lg" />
+          </div>
+          <span className="font-black text-lg tracking-tight uppercase whitespace-nowrap">NotesHub</span>
+        </div>
+
         <button
           onClick={() => setIsSiderOpen(!isSiderOpen)}
-          className="hidden sm:flex w-10 h-10 items-center justify-center
-          bg-white text-black rounded-lg text-lg"
+          className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300 hover:bg-white/10 ${!isSiderOpen ? "mx-auto" : "ml-auto"}`}
         >
-          <MenuOutlined />
+          <MenuOutlined className="text-indigo-400" />
         </button>
-
-        {/* HOME ICON (ONLY WHEN OPEN) */}
-        {isSiderOpen && (
-          <Link
-            to="/"
-            title="Home"
-            className="ml-2 w-10 h-10 flex items-center justify-center
-            bg-white text-black rounded-lg text-lg"
-          >
-            <HomeFilled />
-          </Link>
-        )}
       </div>
 
       {/* MENU */}
-      <nav className="flex flex-col gap-2 mt-4 px-2">
-        {menuItems.map((item) => (
-          <Link
-            key={item.key}
-            to={item.path}
-            className={`relative group flex items-center gap-3 px-3 py-2 rounded-md transition-all
-              ${
-                location.pathname === item.path
-                  ? "bg-white text-black font-medium"
-                  : "hover:bg-blue-500"
-              }`}
-          >
-            <span className="text-lg">{item.icon}</span>
+      <nav className="flex flex-col gap-1.5 mt-8 px-3">
+        {menuItems.map((item) => {
+          const isActive = location.pathname === item.path;
+          return (
+            <Link
+              key={item.key}
+              to={item.path}
+              className={`relative group flex items-center gap-4 px-3 h-12 rounded-xl transition-all duration-200
+                ${
+                  isActive
+                    ? "bg-indigo-600 text-white shadow-lg shadow-indigo-900/20"
+                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                }`}
+            >
+              <span className={`text-xl transition-transform duration-300 ${isActive ? "scale-110" : "group-hover:scale-110"}`}>
+                {item.icon}
+              </span>
 
-            {isSiderOpen && (
-              <span className="whitespace-nowrap">{item.label}</span>
-            )}
-
-            {/* TOOLTIP WHEN CLOSED */}
-            {!isSiderOpen && (
-              <span
-                className="absolute left-14 bg-black text-white text-sm px-2 py-1 rounded-md
-                opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-50"
-              >
+              <span className={`font-semibold tracking-wide transition-all duration-300 whitespace-nowrap ${isSiderOpen ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4 pointer-events-none w-0"}`}>
                 {item.label}
               </span>
-            )}
-          </Link>
-        ))}
+
+              {/* TOOLTIP WHEN CLOSED */}
+              {!isSiderOpen && (
+                <div className="absolute left-16 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-lg 
+                  opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-4 transition-all duration-300 pointer-events-none z-50 shadow-xl border border-white/10">
+                  {item.label}
+                </div>
+              )}
+              
+              {isActive && (
+                <div className="absolute right-0 w-1 h-6 bg-white rounded-l-full" />
+              )}
+            </Link>
+          );
+        })}
       </nav>
 
-      {/* 🔽 BOTTOM ARROW (ONLY WHEN CLOSED) */}
-      {!isSiderOpen && (
-        <div className="absolute bottom-4 left-0 w-full flex justify-center">
+      {/* BOTTOM ACTION */}
+       <div className="absolute bottom-8 left-0 w-full px-3">
           <Link
             to="/"
-            title="Back to Home"
-            className="w-10 h-10 flex items-center justify-center
-            bg-white text-black rounded-lg shadow-md
-            hover:scale-110 transition"
+            className={`flex items-center gap-4 px-3 h-12 rounded-xl transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5 group`}
           >
-            <HomeOutlined />
+            <HomeOutlined className="text-xl shrink-0 group-hover:scale-110 transition-transform" />
+            <span className={`font-semibold tracking-wide transition-all duration-300 whitespace-nowrap ${isSiderOpen ? "opacity-100" : "opacity-0 w-0 pointer-events-none"}`}>
+              Return Home
+            </span>
+            {!isSiderOpen && (
+              <div className="absolute left-16 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-lg 
+                opacity-0 group-hover:opacity-100 translate-x-4 transition-all duration-300 pointer-events-none z-50 shadow-xl border border-white/10">
+                Home
+              </div>
+            )}
           </Link>
-        </div>
-      )}
+       </div>
     </div>
   );
 };

@@ -1,16 +1,22 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import ScreenLoader from "../components/ScreenLoader";
+import { API_URL } from "../constants";
 
-// 1. Create context
-const AuthContext = createContext();
-
-// 2. Initial state
+// 1. Initial state
 const initialState = {
   isAuth: false,
   user: null,
   token: "",
 };
+
+// 2. Create context with robust defaults
+const AuthContext = createContext({
+  ...initialState,
+  handleLogin: () => {},
+  handleRegister: () => {},
+  handleLogout: () => {},
+});
 
 // 3. AuthProvider
 const AuthProvider = ({ children }) => {
@@ -28,7 +34,7 @@ const AuthProvider = ({ children }) => {
 
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/users/profile`,
+        `${API_URL}/users/profile`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -38,7 +44,7 @@ const AuthProvider = ({ children }) => {
 
       setState({
         isAuth: true,
-        user: res.data.user, // ✅ FIX IS HERE
+        user: res.data.user,
         token,
       });
     } catch (error) {
@@ -91,7 +97,13 @@ const AuthProvider = ({ children }) => {
   );
 };
 
-// 10. Custom hook
-export const useAuthContext = () => useContext(AuthContext);
+// 10. Custom hook with safety check
+export const useAuthContext = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuthContext must be used within an AuthProvider");
+  }
+  return context;
+};
 
 export default AuthProvider;

@@ -1,10 +1,12 @@
-import { Button, Col, Form, Input, message, Row, Typography } from "antd";
+import { Button, Col, Form, Input, message, Row, Typography, Card } from "antd";
 import axios from "axios";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../../context/AuthContext";
+import { API_URL, COLORS } from "../../../constants";
+import { LockOutlined, MailOutlined } from "@ant-design/icons";
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 const initialstate = { email: "", password: "" };
 
 const Login = () => {
@@ -28,14 +30,14 @@ const Login = () => {
       if (!email || !password) return message.error("All fields are required");
 
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/users/login`,
+        `${API_URL}/users/login`,
         state,
       );
 
       const { token, user } = res.data;
       handleLogin(user, token);
       navigate("/public");
-      message.success("User login successful");
+      message.success("Logged in successfully! Welcome back.");
     } catch (error) {
       message.error(error.response?.data?.message || "Invalid Credentials");
     } finally {
@@ -43,33 +45,30 @@ const Login = () => {
     }
   };
 
-  const labelStyle = {
-    color: "#1f2937", // dark gray
-    fontWeight: "600",
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-100 via-green-200 to-green-300 px-4">
-      <div className="w-full max-w-md p-8 sm:p-10 rounded-3xl shadow-2xl bg-white/90 backdrop-blur-md border border-green-200">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
+      <div className="absolute top-0 left-0 w-full h-1/2 bg-indigo-600 rounded-b-[40px] shadow-2xl" />
+      
+      <Card className="w-full max-w-md rounded-3xl shadow-2xl border-none p-4 sm:p-6 z-10 overflow-hidden">
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-50 rounded-2xl mb-6 shadow-sm border border-indigo-100">
+            <LockOutlined className="text-3xl text-indigo-600" />
+          </div>
+          <Title level={2} className="font-black! m-0! tracking-tight">
+            Student Login
+          </Title>
+          <Text className="text-gray-400 mt-2 block">Enter your credentials to access your notes</Text>
+        </div>
+
         <Form
           layout="vertical"
           onFinish={handleSubmit}
           onFinishFailed={handleFailed}
+          requiredMark={false}
+          className="space-y-4"
         >
-          <Row>
-            <Col span={24} className="mb-6 text-center">
-              <Title level={2} className="text-green-800 font-extrabold">
-                Student Login
-              </Title>
-              <p className="text-sm text-green-700">
-                Welcome! Please login to access your dashboard
-              </p>
-            </Col>
-          </Row>
-
-          {/* Email */}
           <Form.Item
-            label={<span style={labelStyle}>Email</span>}
+            label={<span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Email Address</span>}
             name="email"
             rules={[
               { required: true, message: "Email is required" },
@@ -78,56 +77,64 @@ const Login = () => {
           >
             <Input
               name="email"
+              prefix={<MailOutlined className="text-gray-300 mr-2" />}
               value={state.email}
               onChange={handleChange}
-              placeholder="Enter your email"
-              className="rounded-xl py-3 px-4 border-green-300 focus:border-green-500 focus:ring-1 focus:ring-green-400"
+              placeholder="name@university.edu"
+              className="rounded-xl py-3 px-4 border-gray-200 focus:border-indigo-500 hover:border-indigo-400"
             />
           </Form.Item>
 
-          {/* Password */}
           <Form.Item
-            label={<span style={labelStyle}>Password</span>}
+            label={<span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Password</span>}
             name="password"
             rules={[{ required: true, message: "Password is required" }]}
           >
             <Input.Password
               name="password"
+              prefix={<LockOutlined className="text-gray-300 mr-2" />}
               value={state.password}
               onChange={handleChange}
-              placeholder="Enter your password"
-              className="rounded-xl py-3 px-4 border-green-300 focus:border-green-500 focus:ring-1 focus:ring-green-400"
+              placeholder="••••••••"
+              className="rounded-xl py-3 px-4 border-gray-200 focus:border-indigo-500 hover:border-indigo-400"
             />
           </Form.Item>
 
-          {/* Links */}
-          <div className="flex justify-between mb-6 text-sm text-green-800">
+          <div className="flex justify-between items-center text-xs font-semibold">
             <Link
               to="/auth/reset-password"
-              className="hover:text-green-600! transition-colors!"
+              className="text-indigo-600 hover:text-indigo-700 transition-colors"
             >
               Forgot Password?
             </Link>
-            <Link
-              to="/auth/register"
-              className="hover:text-green-600! transition-colors!"
-            >
-              Don't have an account?
-            </Link>
           </div>
 
-          {/* Submit */}
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              className="w-full! py-3! rounded-xl! text-white! bg-green-600! hover:bg-green-700! border-none! shadow-lg! transition-all! duration-300! hover:shadow-2xl!"
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+            block
+            size="large"
+            className="h-14 rounded-xl font-bold transition-all duration-300 shadow-lg shadow-indigo-100 hover:shadow-indigo-200 border-none"
+            style={{ backgroundColor: COLORS.primary }}
+          >
+            Sign In to Dashboard
+          </Button>
+
+          <div className="text-center mt-8">
+            <Text className="text-gray-400">Don't have an account? </Text>
+            <Link
+              to="/auth/register"
+              className="text-indigo-600 font-bold hover:text-indigo-700 underline underline-offset-4"
             >
-              Login
-            </Button>
-          </Form.Item>
+              Join your peers
+            </Link>
+          </div>
         </Form>
+      </Card>
+      
+      <div className="fixed bottom-8 text-gray-400 text-[10px] font-bold uppercase tracking-[0.2em] z-10">
+        © 2026 University Notes Sharing System
       </div>
     </div>
   );

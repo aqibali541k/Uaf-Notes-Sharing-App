@@ -1,5 +1,5 @@
 import React from "react";
-import { Tag, Button, Space, Avatar } from "antd";
+import { Tag, Button, Avatar } from "antd";
 import {
   UserOutlined,
   FilePdfOutlined,
@@ -15,84 +15,80 @@ import {
 } from "@ant-design/icons";
 import { COLORS } from "../../constants";
 
+const getFileIcon = (type = "") => {
+  const t = type.toLowerCase();
+  if (t.includes("pdf")) return <FilePdfOutlined className="text-red-500" />;
+  if (t.includes("word") || t.includes("doc")) return <FileWordOutlined className="text-blue-600" />;
+  if (t.includes("excel") || t.includes("sheet")) return <FileExcelOutlined className="text-emerald-600" />;
+  if (t.includes("image")) return <FileImageOutlined className="text-sky-500" />;
+  if (t.includes("zip") || t.includes("rar")) return <FileZipOutlined className="text-amber-500" />;
+  if (t.includes("text") || t.includes("txt")) return <FileTextOutlined className="text-gray-500" />;
+  return <FileUnknownOutlined className="text-gray-400" />;
+};
+
 const NoteCard = ({ note, onDownload, downloadingId, extraActions }) => {
   const isDownloading = downloadingId === note._id;
 
-  const getFileIcon = (type = "") => {
-    const t = type.toLowerCase();
-    if (t.includes("pdf")) return <FilePdfOutlined className="text-red-500" />;
-    if (t.includes("word") || t.includes("doc")) return <FileWordOutlined className="text-blue-500" />;
-    if (t.includes("excel") || t.includes("sheet")) return <FileExcelOutlined className="text-green-600" />;
-    if (t.includes("image")) return <FileImageOutlined className="text-emerald-500" />;
-    if (t.includes("zip") || t.includes("rar")) return <FileZipOutlined className="text-amber-500" />;
-    if (t.includes("text") || t.includes("txt")) return <FileTextOutlined className="text-gray-500" />;
-    return <FileUnknownOutlined className="text-gray-400" />;
-  };
-
   return (
-    <div
-      key={note._id}
-      className="group relative bg-white border border-gray-100 rounded-4xl shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-500 flex flex-col p-6 overflow-hidden"
-    >
+    <div className="bg-white border border-gray-200 rounded-xl hover:border-gray-300 hover:shadow-md transition-all duration-200 flex flex-col p-5">
       {/* Header */}
-      <div className="flex justify-between items-start mb-5">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 flex items-center justify-center bg-gray-50 rounded-2xl group-hover:scale-110 transition-transform duration-300 shadow-inner">
-            <span className="text-2xl flex items-center justify-center">
-              {getFileIcon(note.fileType || note.fileExt)}
-            </span>
+      <div className="flex justify-between items-start mb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 flex items-center justify-center bg-gray-50 border border-gray-100 rounded-lg text-lg">
+            {getFileIcon(note.fileType || note.fileExt)}
           </div>
           <div>
-            <h3 className="text-sm font-black text-gray-800 line-clamp-1 uppercase tracking-tight">
+            <h3 className="text-sm font-semibold text-gray-800 line-clamp-1">
               {note.title}
             </h3>
-            <p className="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-widest">
-              {note.fileExt || "Unknown"} • {note.category || "General"}
+            <p className="text-xs text-gray-400 mt-0.5">
+              {note.fileExt?.toUpperCase() || "File"} · {note.category || "General"}
             </p>
           </div>
         </div>
+
+        {/* Privacy badge */}
         {note.isPrivate ? (
-          <div className="p-2 bg-amber-50 rounded-lg">
-            <LockOutlined className="text-amber-500 flex" title="Private" />
-          </div>
+          <span className="flex items-center gap-1 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-md">
+            <LockOutlined style={{ fontSize: 10 }} /> Private
+          </span>
         ) : (
-          <div className="p-2 bg-indigo-50 rounded-lg">
-            <ShareAltOutlined className="text-indigo-500 flex" title="Public" />
-          </div>
+          <span className="flex items-center gap-1 text-xs font-medium text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-md">
+            <ShareAltOutlined style={{ fontSize: 10 }} /> Public
+          </span>
         )}
       </div>
 
-      {/* Info */}
-      <div className="mb-6 space-y-3">
+      {/* Meta */}
+      <div className="mb-4 space-y-2">
         <div className="flex items-center gap-2">
-          <Avatar size="small" src={note?.user?.image} icon={<UserOutlined />} className="bg-indigo-100" />
-          <span className="text-xs font-bold text-gray-600">
+          <Avatar size={20} src={note?.user?.image} icon={<UserOutlined />} className="bg-gray-100 text-gray-500" />
+          <span className="text-xs text-gray-600">
             {note?.user?.firstName} {note?.user?.lastName}
           </span>
         </div>
-
         <div className="flex items-center gap-2">
-          <Tag className="m-0 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 border-none bg-indigo-50 text-indigo-600 rounded-lg">
-            Section {note?.user?.section || "N/A"}
-          </Tag>
-          <Tag className="m-0 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 border-none bg-emerald-50 text-emerald-600 rounded-lg">
-            {note?.user?.semester || "4"}th Sem
-          </Tag>
+          <span className="text-xs text-gray-500 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded">
+            Sec {note?.user?.section || "N/A"}
+          </span>
+          <span className="text-xs text-gray-500 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded">
+            Sem {note?.user?.semester || "?"}
+          </span>
         </div>
       </div>
 
-      {/* Action Area */}
-      <div className="mt-auto flex flex-col gap-3">
+      {/* Actions */}
+      <div className="mt-auto flex flex-col gap-2">
         <Button
           type="primary"
           block
           icon={<DownloadOutlined />}
           loading={isDownloading}
           onClick={() => onDownload(note)}
-          className="h-12 rounded-2xl font-bold uppercase tracking-widest text-[10px] shadow-lg shadow-indigo-100 hover:shadow-indigo-200 border-none transition-all duration-300"
+          className="h-9 rounded-lg text-sm font-medium border-none"
           style={{ backgroundColor: COLORS.primary }}
         >
-          {isDownloading ? "Preparing..." : "Download Notes"}
+          {isDownloading ? "Preparing…" : "Download"}
         </Button>
 
         {extraActions && (

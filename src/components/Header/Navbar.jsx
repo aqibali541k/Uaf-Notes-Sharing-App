@@ -1,124 +1,130 @@
 import React, { useState } from "react";
-import { Button } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../context/AuthContext";
 import { LoginOutlined, LogoutOutlined } from "@ant-design/icons";
 import Logo from "../../assets/logo.webp";
+
+const NavLink = ({ to, children, onClick }) => {
+  const location = useLocation();
+  const isActive = location.pathname === to;
+  return (
+    <Link
+      to={to}
+      onClick={onClick}
+      className={`text-sm font-medium transition-colors ${
+        isActive
+          ? "text-indigo-600"
+          : "text-gray-600 hover:text-indigo-600"
+      }`}
+    >
+      {children}
+    </Link>
+  );
+};
 
 const Navbar = () => {
   const { isAuth, handleLogout } = useAuthContext();
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const close = () => setIsOpen(false);
 
   return (
-    <nav className="bg-linear-to-r from-indigo-600 via-purple-600 to-pink-500 text-white shadow-md backdrop-blur-md sticky top-0 z-50">
+    <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-14">
           {/* Logo */}
           <Link to="/" className="flex items-center">
             <img
               src={Logo}
-              alt="Logo"
-              className="h-10 sm:h-12 md:h-14 object-contain rounded-lg"
+              alt="NotesHub"
+              className="h-8 sm:h-9 object-contain"
             />
           </Link>
 
-          {/* Desktop Menu */}
-          <ul className="hidden md:flex items-center space-x-8 text-lg font-medium">
+          {/* Desktop Nav */}
+          <ul className="hidden md:flex items-center gap-8">
             <li>
-              <Link
-                to="/"
-                className="relative group cursor-pointer hover:text-yellow-300 transition-colors"
-              >
-                Public
-                <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-yellow-300 transition-all duration-300 group-hover:w-full"></span>
-              </Link>
+              <NavLink to="/">Public</NavLink>
             </li>
-            <li
-              className="relative group cursor-pointer hover:text-yellow-300 transition-colors"
-              onClick={() => navigate("/dashboard/analytics")}
-            >
-              Dashboard
-              <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-yellow-300 transition-all duration-300 group-hover:w-full"></span>
+            <li>
+              <button
+                onClick={() => navigate("/dashboard/analytics")}
+                className="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors"
+              >
+                Dashboard
+              </button>
             </li>
           </ul>
 
-          {/* Auth Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
+          {/* Auth Actions */}
+          <div className="hidden md:flex items-center gap-3">
             {!isAuth ? (
               <Link to="/auth/login">
-                <Button className="text-white! bg-green-600! border-none! rounded-2xl! hover:bg-green-500 transition-all">
+                <button className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg border border-indigo-600 text-indigo-600 hover:bg-indigo-50 transition-colors">
                   <LoginOutlined />
-                  <span className="ml-1">Login</span>
-                </Button>
+                  Login
+                </button>
               </Link>
             ) : (
-              <Button
-                className="text-white! bg-red-600! border-none! rounded-2xl! hover:bg-red-500 transition-all"
+              <button
                 onClick={handleLogout}
+                className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
               >
                 <LogoutOutlined />
-                <span className="ml-1">Logout</span>
-              </Button>
+                Logout
+              </button>
             )}
           </div>
 
           {/* Mobile Hamburger */}
           <button
-            className="md:hidden text-white! text-2xl! focus:outline-none!"
+            className="md:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
             onClick={() => setIsOpen(!isOpen)}
+            aria-label="Toggle menu"
           >
-            {isOpen ? (
-              <FontAwesomeIcon icon={faTimes} />
-            ) : (
-              <FontAwesomeIcon icon={faBars} />
-            )}
+            <FontAwesomeIcon icon={isOpen ? faTimes : faBars} />
           </button>
         </div>
+      </div>
 
-        {/* Mobile Menu with Smooth Slide */}
-        <div
-          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-            isOpen ? "max-h-96 mt-4" : "max-h-0"
-          }`}
-        >
+      {/* Mobile Menu */}
+      <div
+        className={`md:hidden border-t border-gray-100 overflow-hidden transition-all duration-200 ease-in-out ${
+          isOpen ? "max-h-64" : "max-h-0"
+        }`}
+      >
+        <div className="px-4 py-3 space-y-1">
           <Link
             to="/"
-            className="block text-white! text-lg! font-medium! py-2! px-4! rounded-lg! hover:bg-white/20 transition-colors"
-            onClick={() => setIsOpen(false)}
+            onClick={close}
+            className="block py-2 px-3 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
           >
             Public
           </Link>
-
-          <div
-            className="block text-white! text-lg! font-medium! py-2! px-4! rounded-lg! hover:bg-white/20 transition-colors cursor-pointer"
-            onClick={() => {
-              navigate("/dashboard/analytics");
-              setIsOpen(false);
-            }}
+          <button
+            className="w-full text-left py-2 px-3 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            onClick={() => { navigate("/dashboard/analytics"); close(); }}
           >
             Dashboard
+          </button>
+          <div className="pt-2 border-t border-gray-100">
+            {!isAuth ? (
+              <Link to="/auth/login" onClick={close}>
+                <button className="w-full mt-2 flex items-center justify-center gap-1.5 text-sm font-medium py-2 px-4 rounded-lg border border-indigo-600 text-indigo-600 hover:bg-indigo-50 transition-colors">
+                  <LoginOutlined /> Login
+                </button>
+              </Link>
+            ) : (
+              <button
+                onClick={() => { handleLogout(); close(); }}
+                className="w-full mt-2 flex items-center justify-center gap-1.5 text-sm font-medium py-2 px-4 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+              >
+                <LogoutOutlined /> Logout
+              </button>
+            )}
           </div>
-
-          {!isAuth ? (
-            <Link to="/auth/login">
-              <Button className="w-full mt-2 mb-2! text-white! bg-green-600! border-none! rounded-2xl! hover:bg-green-500! transition-all!">
-                Login
-              </Button>
-            </Link>
-          ) : (
-            <Button
-              className="w-full text-white! mb-4! bg-red-600! border-none! rounded-2xl! hover:bg-red-500! transition-all!"
-              onClick={() => {
-                handleLogout();
-                setIsOpen(false);
-              }}
-            >
-              Logout
-            </Button>
-          )}
         </div>
       </div>
     </nav>

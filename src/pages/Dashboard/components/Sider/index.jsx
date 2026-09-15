@@ -16,7 +16,7 @@ import { useAuthContext } from "../../../../context/AuthContext";
 const Sider = () => {
   const { isSiderOpen, setIsSiderOpen } = useTabContext();
   const { user } = useAuthContext();
-  const location = useLocation();
+  const { pathname } = useLocation();
 
   const menuItems = [
     { key: "Analytics", label: "Analytics", icon: <BarChartOutlined />, path: "/dashboard/analytics" },
@@ -36,55 +36,70 @@ const Sider = () => {
   }
 
   return (
-    <div
-      className={`fixed top-0 bottom-0 left-0 z-50 text-white border-r border-white/10
-        transition-all duration-300 ease-in-out
-        ${isSiderOpen ? "w-60" : "w-16"}`}
-      style={{ backgroundColor: "#1a1c2e" }}
+    <aside
+      aria-label="Dashboard sidebar"
+      className={`fixed bottom-0 left-0 top-0 z-50 flex flex-col border-r border-slate-200 bg-white transition-all duration-300 ease-in-out ${
+        isSiderOpen ? "w-60" : "w-16"
+      }`}
     >
       {/* Branding / Toggle */}
-      <div className="flex items-center h-14 px-3 border-b border-white/5">
+      <div className="flex h-16 shrink-0 items-center border-b border-slate-100 px-3">
         <div
           className={`flex items-center gap-2.5 overflow-hidden transition-all duration-300 ${
-            isSiderOpen ? "opacity-100 flex-1" : "opacity-0 w-0"
+            isSiderOpen ? "flex-1 opacity-100" : "w-0 opacity-0"
           }`}
         >
-          <div className="w-7 h-7 bg-indigo-500 rounded-md flex items-center justify-center shrink-0">
-            <HomeFilled className="text-white text-sm" />
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-white">
+            <HomeFilled className="text-sm" aria-hidden="true" />
           </div>
-          <span className="font-semibold text-sm tracking-wide whitespace-nowrap">NotesHub</span>
+          <span className="whitespace-nowrap text-sm font-semibold text-slate-800">
+            UAF Notes
+          </span>
         </div>
 
         <button
+          type="button"
           onClick={() => setIsSiderOpen(!isSiderOpen)}
-          className={`w-9 h-9 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors ${
+          aria-label={isSiderOpen ? "Collapse sidebar" : "Expand sidebar"}
+          aria-expanded={isSiderOpen}
+          className={`flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 ${
             !isSiderOpen ? "mx-auto" : "ml-auto"
           }`}
-          aria-label="Toggle sidebar"
         >
-          <MenuOutlined className="text-gray-400 text-sm" />
+          <MenuOutlined className="text-sm" aria-hidden="true" />
         </button>
       </div>
 
       {/* Menu */}
-      <nav className="flex flex-col gap-0.5 mt-4 px-2">
+      <nav aria-label="Dashboard" className="mt-4 flex flex-col gap-1 px-2">
         {menuItems.map((item) => {
-          const isActive = location.pathname === item.path;
+          const isActive = pathname === item.path;
+
           return (
             <Link
               key={item.key}
               to={item.path}
-              className={`group relative flex items-center gap-3 px-2.5 h-10 rounded-lg transition-colors duration-150 ${
+              aria-current={isActive ? "page" : undefined}
+              className={`group relative flex h-10 items-center gap-3 rounded-lg px-2.5 transition-colors ${
                 isActive
-                  ? "bg-indigo-600 text-white"
-                  : "text-gray-400 hover:text-white hover:bg-white/5"
+                  ? "bg-brand-50 text-brand-700"
+                  : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
               }`}
             >
-              <span className="text-base shrink-0">{item.icon}</span>
+              <span
+                className={`shrink-0 text-base ${
+                  isActive ? "text-brand-600" : ""
+                }`}
+                aria-hidden="true"
+              >
+                {item.icon}
+              </span>
 
               <span
-                className={`text-sm font-medium tracking-normal whitespace-nowrap transition-all duration-300 ${
-                  isSiderOpen ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2 pointer-events-none w-0"
+                className={`whitespace-nowrap text-sm font-medium transition-all duration-300 ${
+                  isSiderOpen
+                    ? "translate-x-0 opacity-100"
+                    : "pointer-events-none w-0 -translate-x-2 opacity-0"
                 }`}
               >
                 {item.label}
@@ -92,16 +107,9 @@ const Sider = () => {
 
               {/* Tooltip when collapsed */}
               {!isSiderOpen && (
-                <div className="absolute left-14 bg-gray-800 text-white text-xs font-medium px-2.5 py-1.5 rounded-md
-                  opacity-0 group-hover:opacity-100 pointer-events-none z-50 border border-white/10 whitespace-nowrap
-                  translate-x-1 group-hover:translate-x-0 transition-all duration-200">
+                <span className="pointer-events-none absolute left-14 z-50 translate-x-1 whitespace-nowrap rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 opacity-0 shadow-sm transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100">
                   {item.label}
-                </div>
-              )}
-
-              {/* Active indicator */}
-              {isActive && (
-                <div className="absolute right-0 w-0.5 h-5 bg-white/60 rounded-l" />
+                </span>
               )}
             </Link>
           );
@@ -109,29 +117,27 @@ const Sider = () => {
       </nav>
 
       {/* Bottom: Return Home */}
-      <div className="absolute bottom-6 left-0 w-full px-2">
+      <div className="mt-auto border-t border-slate-100 p-2">
         <Link
           to="/"
-          className="group relative flex items-center gap-3 px-2.5 h-10 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+          className="group relative flex h-10 items-center gap-3 rounded-lg px-2.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
         >
-          <HomeOutlined className="text-base shrink-0" />
+          <HomeOutlined className="shrink-0 text-base" aria-hidden="true" />
           <span
-            className={`text-sm font-medium whitespace-nowrap transition-all duration-300 ${
-              isSiderOpen ? "opacity-100" : "opacity-0 w-0 pointer-events-none"
+            className={`whitespace-nowrap text-sm font-medium transition-all duration-300 ${
+              isSiderOpen ? "opacity-100" : "pointer-events-none w-0 opacity-0"
             }`}
           >
             Return Home
           </span>
           {!isSiderOpen && (
-            <div className="absolute left-14 bg-gray-800 text-white text-xs font-medium px-2.5 py-1.5 rounded-md
-              opacity-0 group-hover:opacity-100 pointer-events-none z-50 border border-white/10
-              translate-x-1 group-hover:translate-x-0 transition-all duration-200">
+            <span className="pointer-events-none absolute left-14 z-50 translate-x-1 whitespace-nowrap rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 opacity-0 shadow-sm transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100">
               Home
-            </div>
+            </span>
           )}
         </Link>
       </div>
-    </div>
+    </aside>
   );
 };
 

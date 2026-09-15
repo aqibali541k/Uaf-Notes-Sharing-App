@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import Profile from "./Profile";
 import CreateNotes from "./CreateNotes";
 import Analytics from "./Analytics";
@@ -13,7 +13,7 @@ const Index = () => {
     <main className="flex flex-col min-h-screen flex-1">
       <Header />
 
-      <div className="flex-1 bg-gray-50 p-4 md:p-6 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto bg-slate-50">
         <Routes>
           <Route path="profile" element={<Profile />} />
           <Route path="new-notes" element={<CreateNotes />} />
@@ -21,6 +21,8 @@ const Index = () => {
           <Route path="shared" element={<Shared />} />
           <Route path="private" element={<Private />} />
           <Route path="all-users" element={<AllStudents />} />
+          {/* /dashboard and unknown sub-paths land on the analytics overview */}
+          <Route path="*" element={<Navigate to="/dashboard/analytics" replace />} />
         </Routes>
       </div>
     </main>

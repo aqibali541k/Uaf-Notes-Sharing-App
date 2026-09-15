@@ -69,7 +69,7 @@ const Analytics = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
         <Spin size="large" />
-        <Text className="text-sm text-gray-400">Loading analytics…</Text>
+        <Text className="text-sm text-slate-400">Loading analytics…</Text>
       </div>
     );
   }
@@ -79,8 +79,8 @@ const Analytics = () => {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-xl font-medium text-gray-900">Analytics</h1>
-          <p className="text-sm text-gray-500">Your note-taking activity and library overview</p>
+          <h1 className="text-xl font-medium text-slate-900">Analytics</h1>
+          <p className="text-sm text-slate-500">Your note-taking activity and library overview</p>
         </div>
         {user?.role === "admin" && (
           <Select defaultValue="self" className="w-48 h-9" placeholder="View scope">
@@ -93,12 +93,12 @@ const Analytics = () => {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8">
         {/* Pie Chart */}
-        <div className="bg-white border border-gray-200 rounded-xl p-6">
+        <div className="bg-white border border-slate-200 rounded-xl p-6">
           <div className="flex items-center gap-2 mb-6">
-            <PieChartOutlined className="text-indigo-600 text-base" />
+            <PieChartOutlined className="text-brand-600 text-base" />
             <div>
-              <h2 className="text-sm font-semibold text-gray-800">Library Distribution</h2>
-              <p className="text-xs text-gray-400">Snapshot of your note categories</p>
+              <h2 className="text-sm font-semibold text-slate-800">Library Distribution</h2>
+              <p className="text-xs text-slate-400">Snapshot of your note categories</p>
             </div>
           </div>
           <div className="w-full h-72">
@@ -131,12 +131,12 @@ const Analytics = () => {
         </div>
 
         {/* Bar Chart */}
-        <div className="bg-white border border-gray-200 rounded-xl p-6">
+        <div className="bg-white border border-slate-200 rounded-xl p-6">
           <div className="flex items-center gap-2 mb-6">
             <BarChartOutlined className="text-emerald-600 text-base" />
             <div>
-              <h2 className="text-sm font-semibold text-gray-800">Monthly Activity</h2>
-              <p className="text-xs text-gray-400">Contribution trends over time</p>
+              <h2 className="text-sm font-semibold text-slate-800">Monthly Activity</h2>
+              <p className="text-xs text-slate-400">Contribution trends over time</p>
             </div>
           </div>
           <div className="w-full h-72">

@@ -1,37 +1,40 @@
 import React from "react";
-import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
+import { LogoutOutlined } from "@ant-design/icons";
 import { useAuthContext } from "../../../../context/AuthContext";
 
 const Header = () => {
   const { handleLogout, user } = useAuthContext();
 
   return (
-    <header className="flex items-center h-14 bg-white/80 backdrop-blur-md border-b border-gray-100 px-6 sm:px-8 sticky top-0 z-45">
-      {/* Role Indicator */}
-      <div className="flex items-center gap-4">
-        <div className="hidden sm:flex flex-col">
-          <h2 className="text-sm font-semibold text-gray-800 leading-tight">
-            {user?.role === "admin" ? "Systems Administrator" : "Student Portal"}
-          </h2>
-          <span className="text-xs text-gray-500 leading-tight">
-             Manage & share university resources
-          </span>
-        </div>
+    <header className="sticky top-0 z-40 flex h-16 items-center border-b border-slate-200 bg-white px-5 sm:px-6">
+      {/* Page context */}
+      <div className="flex min-w-0 flex-col">
+        <h1 className="truncate text-sm font-semibold text-slate-800">
+          {user?.role === "admin" ? "Administrator" : "Student Portal"}
+        </h1>
+        <span className="truncate text-xs text-slate-500">
+          Manage and share university resources
+        </span>
       </div>
 
-      {/* Logout Button (Right Side) */}
-      <div className="ml-auto flex items-center gap-4 sm:gap-6">
-        <div className="hidden md:flex flex-col text-right">
-           <span className="text-sm font-medium text-gray-800 leading-tight">{user?.firstName} {user?.lastName}</span>
-           <span className="text-xs text-indigo-500 font-medium leading-tight tracking-wide">AG-{user?.agNo?.split('-AG-')[1] || "6000"}</span>
+      {/* User + logout */}
+      <div className="ml-auto flex items-center gap-3 sm:gap-5">
+        <div className="hidden flex-col text-right md:flex">
+          <span className="text-sm font-medium leading-tight text-slate-800">
+            {user?.firstName} {user?.lastName}
+          </span>
+          <span className="text-xs font-medium leading-tight text-slate-500">
+            AG-{user?.agNo?.split("-AG-")[1] || "6000"}
+          </span>
         </div>
 
         <button
+          type="button"
           onClick={handleLogout}
-          className="group flex items-center gap-2 text-gray-500 hover:text-red-600 px-3 h-9 rounded-lg transition-colors duration-200 border border-transparent hover:bg-red-50"
+          className="flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-slate-200 px-3 text-sm font-medium text-slate-600 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600"
         >
-          <span className="hidden sm:inline text-sm font-medium">Sign out</span>
-          <LogoutOutlined className="text-sm group-hover:rotate-12 transition-transform" />
+          <span className="hidden sm:inline">Sign out</span>
+          <LogoutOutlined className="text-sm" aria-hidden="true" />
         </button>
       </div>
     </header>

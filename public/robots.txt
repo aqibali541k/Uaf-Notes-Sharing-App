@@ -1,0 +1,19 @@
+# robots.txt - UAF Notes Sharing App
+# Public homepage is crawlable; auth and dashboard areas are private.
+
+User-agent: *
+Allow: /
+
+# Authentication (login, register, password reset) - never index
+Disallow: /auth
+Disallow: /auth/
+
+# Signed-in user area - never index
+Disallow: /dashboard
+Disallow: /dashboard/
+
+# Reserved in case an admin area is added later
+Disallow: /admin
+Disallow: /admin/
+
+Sitemap: https://dcspars.dpdns.org/sitemap.xml

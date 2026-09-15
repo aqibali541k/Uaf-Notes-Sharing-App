@@ -1,10 +1,14 @@
 import React from "react";
-import "../../src/App.css"; // Make sure your loader CSS is here
 
 const ScreenLoader = () => {
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <span className="loader"></span>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-50/80 backdrop-blur-sm"
+      role="status"
+      aria-live="polite"
+    >
+      <span className="loader" />
+      <span className="sr-only">Loading…</span>
     </div>
   );
 };

@@ -1,31 +1,43 @@
 import React, { useEffect, useState } from "react";
 import {
-  Table,
   Avatar,
   Button,
-  message,
+  Grid,
   Popconfirm,
   Spin,
-  Card,
+  Table,
   Tag,
-  Grid,
   Typography,
-  Space,
+  message,
 } from "antd";
 import {
-  UserOutlined,
+  CheckOutlined,
   DeleteOutlined,
   StopOutlined,
-  CheckOutlined,
-  RobotOutlined,
   TeamOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
 import { useAuthContext } from "../../../../context/AuthContext";
-import { API_URL, COLORS } from "../../../../constants";
+import { API_URL } from "../../../../constants";
 
 const { useBreakpoint } = Grid;
-const { Title, Text } = Typography;
+const { Text } = Typography;
+
+const StatusTag = ({ blocked }) => (
+  <Tag
+    color={blocked ? "red" : "green"}
+    className="m-0 rounded-full border-none px-2.5 text-[11px] font-medium"
+  >
+    {blocked ? "Blocked" : "Active"}
+  </Tag>
+);
+
+const Chip = ({ children }) => (
+  <span className="rounded border border-slate-100 bg-slate-50 px-2 py-0.5 text-xs text-slate-600">
+    {children}
+  </span>
+);
 
 const AllStudents = () => {
   const { token, user } = useAuthContext();
@@ -33,17 +45,18 @@ const AllStudents = () => {
   const [loading, setLoading] = useState(false);
   const screens = useBreakpoint();
   const isMobile = !screens.md;
+  const isAdmin = user?.role === "admin";
 
   // ================= ADMIN VALIDATION =================
   useEffect(() => {
-    if (!user || user.role !== "admin") {
+    if (!isAdmin) {
       message.error("Access denied. Admin only page.");
     }
-  }, [user]);
+  }, [isAdmin]);
 
   // ================= FETCH USERS =================
   const fetchUsers = async () => {
-    if (!user || user.role !== "admin") return;
+    if (!isAdmin) return;
 
     try {
       setLoading(true);
@@ -99,6 +112,8 @@ const AllStudents = () => {
     }
   };
 
+  const agNumber = (agNo) => agNo?.split("-AG-")[1] || agNo;
+
   // ================= TABLE COLUMNS (DESKTOP) =================
   const columns = [
     {
@@ -106,71 +121,68 @@ const AllStudents = () => {
       key: "student",
       render: (_, r) => (
         <div className="flex items-center gap-3">
-          <Avatar 
-            src={r.image} 
-            icon={<UserOutlined />} 
-            className="bg-indigo-100 text-indigo-600 font-bold border-2 border-white shadow-sm"
+          <Avatar
+            src={r.image}
+            icon={<UserOutlined />}
+            className="bg-slate-100 text-slate-500"
           />
           <div className="flex flex-col">
-            <Text className="font-bold text-gray-800">{r.firstName} {r.lastName}</Text>
-            <Text className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{r.email}</Text>
+            <Text className="text-sm font-medium text-slate-800">
+              {r.firstName} {r.lastName}
+            </Text>
+            <Text className="text-xs text-slate-400">{r.email}</Text>
           </div>
         </div>
       ),
     },
-    { 
-      title: "Academic Info", 
+    {
+      title: "Academic",
       key: "academic",
       render: (_, r) => (
-        <div className="flex flex-col gap-1">
-          <Text className="text-xs font-bold text-gray-600">{r.degree}</Text>
+        <div className="flex flex-col gap-1.5">
+          <Text className="text-sm text-slate-700">{r.degree}</Text>
           <div className="flex gap-2">
-             <Tag className="m-0! rounded-full text-[9px] font-black uppercase tracking-tighter bg-gray-50 border-gray-100">Sem {r.semester}</Tag>
-             <Tag className="m-0! rounded-full text-[9px] font-black uppercase tracking-tighter bg-gray-50 border-gray-100">Sec {r.section}</Tag>
+            <Chip>Sem {r.semester}</Chip>
+            <Chip>Sec {r.section}</Chip>
           </div>
         </div>
-      )
-    },
-    { 
-      title: "AG Number", 
-      dataIndex: "agNo",
-      render: (ag) => (
-        <Tag className="rounded-lg font-black bg-indigo-50 border-indigo-100 text-indigo-600">
-          {ag?.split('-AG-')[1] || ag}
-        </Tag>
-      )
+      ),
     },
     {
-      title: "Account Status",
-      key: "status",
-      render: (_, r) => (
-        <Tag color={r.isBlocked ? "volcano" : "emerald"} className="rounded-full px-3 py-0.5 border-none font-bold text-[10px] uppercase tracking-widest">
-          {r.isBlocked ? "Blocked" : "Healthy"}
+      title: "AG Number",
+      dataIndex: "agNo",
+      render: (ag) => (
+        <Tag className="m-0 rounded-md border-brand-100 bg-brand-50 font-medium text-brand-700">
+          AG-{agNumber(ag)}
         </Tag>
       ),
     },
     {
-      title: "Management",
+      title: "Status",
+      key: "status",
+      render: (_, r) => <StatusTag blocked={r.isBlocked} />,
+    },
+    {
+      title: "",
       key: "actions",
       render: (_, r) => (
-        <div className="flex gap-2">
+        <div className="flex justify-end gap-2">
           <Button
             size="small"
-            className={`rounded-lg font-bold border-none ${r.isBlocked ? "bg-emerald-50 text-emerald-600" : "bg-orange-50 text-orange-600"}`}
+            className="rounded-lg"
             icon={r.isBlocked ? <CheckOutlined /> : <StopOutlined />}
             onClick={() => toggleBlock(r._id, r.isBlocked)}
           >
             {r.isBlocked ? "Restore" : "Restrict"}
           </Button>
           <Popconfirm
-            title="Purge student record?"
+            title="Delete this student?"
             description="This action cannot be undone."
             onConfirm={() => deleteUser(r._id)}
-            okButtonProps={{ danger: true, className: "rounded-lg" }}
-            cancelButtonProps={{ className: "rounded-lg" }}
+            okButtonProps={{ danger: true }}
             centered
           >
-            <Button size="small" danger className="rounded-lg border-none bg-red-50" icon={<DeleteOutlined />} />
+            <Button size="small" danger icon={<DeleteOutlined />} aria-label="Delete student" />
           </Popconfirm>
         </div>
       ),
@@ -179,31 +191,39 @@ const AllStudents = () => {
 
   // ================= MOBILE CARD =================
   const StudentCard = ({ s }) => (
-    <Card className="mb-4 rounded-3xl shadow-sm border-gray-100 overflow-hidden">
-      <div className="flex items-start gap-4">
-        <Avatar size={60} src={s.image} icon={<UserOutlined />} className="bg-indigo-100 text-indigo-600 font-bold border-4 border-white shadow-md shrink-0" />
+    <div className="mb-3 rounded-xl border border-slate-200 bg-white p-4">
+      <div className="flex items-start gap-3">
+        <Avatar
+          size={48}
+          src={s.image}
+          icon={<UserOutlined />}
+          className="shrink-0 bg-slate-100 text-slate-500"
+        />
 
-        <div className="flex-1">
-          <div className="flex justify-between items-start">
-             <div>
-                <h3 className="font-black text-gray-800 text-base m-0 tracking-tight">{s.firstName} {s.lastName}</h3>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">{s.email}</p>
-             </div>
-             <Tag color={s.isBlocked ? "red" : "green"} className="m-0! rounded-full text-[9px] font-black uppercase border-none">
-                {s.isBlocked ? "Blocked" : "Active"}
-             </Tag>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <h3 className="truncate text-sm font-semibold text-slate-900">
+                {s.firstName} {s.lastName}
+              </h3>
+              <p className="truncate text-xs text-slate-400">{s.email}</p>
+            </div>
+            <StatusTag blocked={s.isBlocked} />
           </div>
 
-          <Row gutter={[8, 8]} className="mb-4">
-            <Col span={12}><Space className="text-[10px] font-bold text-gray-500 uppercase"><RobotOutlined className="text-indigo-500" /> {s.degree}</Space></Col>
-            <Col span={12}><Space className="text-[10px] font-bold text-gray-500 uppercase"><TeamOutlined className="text-indigo-500" /> Sec {s.section}</Space></Col>
-            <Col span={24}><Tag className="w-full text-center rounded-xl font-black bg-gray-50 border-gray-100">AG-{s.agNo?.split('-AG-')[1] || s.agNo}</Tag></Col>
-          </Row>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Chip>{s.degree}</Chip>
+            <Chip>Sem {s.semester}</Chip>
+            <Chip>Sec {s.section}</Chip>
+            <span className="rounded border border-brand-100 bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-700">
+              AG-{agNumber(s.agNo)}
+            </span>
+          </div>
 
-          <div className="flex gap-2">
+          <div className="mt-3 flex gap-2">
             <Button
               block
-              className={`rounded-xl font-bold ${s.isBlocked ? "bg-emerald-50 text-emerald-600" : "bg-orange-50 text-orange-600"} border-none`}
+              className="rounded-lg"
               icon={s.isBlocked ? <CheckOutlined /> : <StopOutlined />}
               onClick={() => toggleBlock(s._id, s.isBlocked)}
             >
@@ -211,85 +231,89 @@ const AllStudents = () => {
             </Button>
 
             <Popconfirm
-              title="Delete record?"
+              title="Delete this student?"
               onConfirm={() => deleteUser(s._id)}
-              okButtonProps={{ danger: true, className: "rounded-xl" }}
-              cancelButtonProps={{ className: "rounded-xl" }}
+              okButtonProps={{ danger: true }}
               centered
             >
-              <Button danger className="rounded-xl border-none bg-red-50" icon={<DeleteOutlined />} />
+              <Button danger icon={<DeleteOutlined />} aria-label="Delete student" />
             </Popconfirm>
           </div>
         </div>
       </div>
-    </Card>
+    </div>
   );
 
-  if (!user || user.role !== "admin") {
+  if (!isAdmin) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
-        <Card className="rounded-[3rem] shadow-2xl border-none p-12 text-center max-w-md">
-           <StopOutlined className="text-7xl text-red-400 mb-6" />
-           <Title level={2} className="m-0! font-black! tracking-tight text-gray-800">UNAUTHORIZED</Title>
-           <Text className="text-gray-400 mt-4 block text-lg">This command center is reserved for high-level clearance only. Please return to your station.</Text>
-           <Button type="primary" size="large" onClick={() => window.history.back()} className="mt-8 h-14 px-10 rounded-2xl bg-indigo-600 font-bold uppercase tracking-widest text-xs border-none">Initiate Return</Button>
-        </Card>
+      <div className="flex min-h-[60vh] items-center justify-center p-6">
+        <div className="max-w-sm rounded-xl border border-slate-200 bg-white p-8 text-center">
+          <div
+            className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-500"
+            aria-hidden="true"
+          >
+            <StopOutlined className="text-lg" />
+          </div>
+          <h1 className="text-lg font-semibold text-slate-900">
+            Admin access only
+          </h1>
+          <p className="mt-2 text-sm text-slate-500">
+            This page is only available to administrators.
+          </p>
+          <Button
+            type="primary"
+            onClick={() => window.history.back()}
+            className="mt-6 h-9 rounded-lg"
+          >
+            Go back
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 min-h-screen">
-      {/* Header Section */}
-      <Card className="rounded-[2.5rem] shadow-xl border-none overflow-hidden mb-12 bg-indigo-600">
-        <div className="p-8 sm:p-12 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
-            <TeamOutlined className="text-[160px] text-white" />
-          </div>
-          
-          <div className="relative z-10 text-center md:text-left">
-            <Title level={1} className="m-0! text-white font-black! tracking-tight">Student Control Center</Title>
-            <Text className="text-indigo-100 mt-2 block text-lg opacity-90">Manage student access, verify credentials, and maintain network integrity.</Text>
-          </div>
-          
-          <Space className="relative z-10 bg-white/10 backdrop-blur-md p-4 rounded-3xl border border-white/20">
-             <div className="text-center px-4">
-                <div className="text-2xl font-black text-white">{users.length}</div>
-                <div className="text-[9px] font-black text-indigo-200 uppercase tracking-widest">Active Students</div>
-             </div>
-          </Space>
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      {/* Header */}
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-xl font-semibold text-slate-900">Students</h1>
+          <p className="mt-0.5 text-sm text-slate-500">
+            Manage student accounts and access
+          </p>
         </div>
-      </Card>
+        <div className="inline-flex items-center gap-2 self-start rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm">
+          <TeamOutlined className="text-brand-600" aria-hidden="true" />
+          <span className="font-semibold text-slate-900">{users.length}</span>
+          <span className="text-slate-500">students</span>
+        </div>
+      </div>
 
-      {/* Main Content */}
+      {/* Content */}
       <div className="relative">
         {loading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/20 backdrop-blur-sm z-50 rounded-4xl">
+          <div className="absolute inset-0 z-40 flex items-center justify-center rounded-xl bg-white/60">
             <Spin size="large" />
           </div>
         )}
 
         {isMobile ? (
-          <div className="pb-8">
+          <div>
             {users.length ? (
               users.map((s) => <StudentCard key={s._id} s={s} />)
             ) : (
-              <div className="flex flex-col items-center justify-center py-20 bg-gray-50/50 rounded-[3rem] border border-dashed border-gray-200">
-                <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">No personnel records found</p>
+              <div className="rounded-xl border border-dashed border-slate-200 bg-white py-16 text-center">
+                <p className="text-sm text-slate-400">No students found</p>
               </div>
             )}
           </div>
         ) : (
-          <div className="bg-white rounded-4xl shadow-xl border border-gray-100 p-4">
+          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
             <Table
               columns={columns}
               dataSource={users}
               rowKey="_id"
-              pagination={{ 
-                pageSize: 8,
-                className: "custom-pagination"
-              }}
-              className="custom-table"
+              pagination={{ pageSize: 8 }}
             />
           </div>
         )}

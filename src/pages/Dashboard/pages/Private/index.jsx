@@ -9,7 +9,7 @@ import {
 } from "@ant-design/icons";
 import { useAuthContext } from "../../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { API_URL } from "../../../../constants";
+import { API_URL, COLORS } from "../../../../constants";
 import NoteCard from "../../../../components/common/NoteCard";
 
 const { Title, Text } = Typography;
@@ -43,7 +43,7 @@ const Private = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/users/all`, {
+      const res = await axios.get(`${API_URL}/users/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUsers(res.data.users || []);
@@ -62,7 +62,7 @@ const Private = () => {
   const handleTogglePrivacy = async (note) => {
     try {
       await axios.put(
-        `${import.meta.env.VITE_API_URL}/notes/privacy/${note._id}`,
+        `${API_URL}/notes/privacy/${note._id}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -82,7 +82,7 @@ const Private = () => {
   const handleDelete = async (note) => {
     try {
       await axios.delete(
-        `${import.meta.env.VITE_API_URL}/notes/delete/${note._id}`,
+        `${API_URL}/notes/delete/${note._id}`,
         { headers: { Authorization: `Bearer ${token}` } },
       );
       message.success("Note deleted");
@@ -96,7 +96,7 @@ const Private = () => {
     if (!currentNote) return;
     try {
       await axios.post(
-        `${import.meta.env.VITE_API_URL}/notes/share/${currentNote._id}`,
+        `${API_URL}/notes/share/${currentNote._id}`,
         { sharedWith: selectedUsers },
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -136,7 +136,7 @@ const Private = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
         <Spin size="large" />
-        <Text className="text-sm text-gray-400">Loading your notes…</Text>
+        <Text className="text-sm text-slate-400">Loading your notes…</Text>
       </div>
     );
   }
@@ -146,15 +146,15 @@ const Private = () => {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">My Notes</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Manage, edit, and share your uploaded resources</p>
+          <h1 className="text-xl font-semibold text-slate-900">My Notes</h1>
+          <p className="text-sm text-slate-500 mt-0.5">Manage, edit, and share your uploaded resources</p>
         </div>
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => navigate("/dashboard/new-notes")}
           className="h-9 rounded-lg text-sm font-medium border-none"
-          style={{ backgroundColor: "#4f46e5" }}
+          style={{ backgroundColor: COLORS.primary }}
         >
           Upload Note
         </Button>
@@ -162,9 +162,9 @@ const Private = () => {
 
       {/* Notes Grid */}
       {notes.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 border border-dashed border-gray-200 rounded-xl bg-gray-50">
-          <LockOutlined className="text-4xl text-gray-300 mb-3" />
-          <p className="text-sm text-gray-400">Your vault is empty — upload your first note above</p>
+        <div className="flex flex-col items-center justify-center py-20 border border-dashed border-slate-200 rounded-xl bg-slate-50">
+          <LockOutlined className="text-4xl text-slate-300 mb-3" />
+          <p className="text-sm text-slate-400">Your vault is empty — upload your first note above</p>
         </div>
       ) : (
         <Row gutter={[20, 20]}>
@@ -218,21 +218,21 @@ const Private = () => {
         onCancel={() => setShareModalVisible(false)}
         onOk={handleShareSubmit}
         okText="Share"
-        title={<span className="text-sm font-semibold text-gray-800">Share Resource</span>}
+        title={<span className="text-sm font-semibold text-slate-800">Share Resource</span>}
         centered
         width={460}
-        okButtonProps={{ className: "h-9 rounded-lg", style: { backgroundColor: "#4f46e5" } }}
+        okButtonProps={{ className: "h-9 rounded-lg", style: { backgroundColor: COLORS.primary } }}
         cancelButtonProps={{ className: "h-9 rounded-lg" }}
       >
         <div className="py-4">
           <Input
-            prefix={<SearchOutlined className="text-gray-400" />}
+            prefix={<SearchOutlined className="text-slate-400" />}
             placeholder="Search students…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="mb-4 h-9 rounded-lg border-gray-200"
+            className="mb-4 h-9 rounded-lg border-slate-200"
           />
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Select recipients</p>
+          <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-3">Select recipients</p>
           <div className="max-h-64 overflow-y-auto space-y-1 pr-1">
             {filteredUsers.map((u) => (
               <div
@@ -246,16 +246,16 @@ const Private = () => {
                 }
                 className={`flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition-colors border ${
                   selectedUsers.includes(u._id)
-                    ? "bg-indigo-50 border-indigo-200"
-                    : "bg-white border-gray-100 hover:bg-gray-50"
+                    ? "bg-brand-50 border-brand-200"
+                    : "bg-white border-slate-100 hover:bg-slate-50"
                 }`}
               >
-                <Avatar size="small" src={u.image} className="bg-indigo-100 text-indigo-600 font-semibold shrink-0">
+                <Avatar size="small" src={u.image} className="bg-brand-100 text-brand-600 font-semibold shrink-0">
                   {u.firstName[0]}
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-800 truncate">{u.firstName} {u.lastName}</p>
-                  <p className="text-xs text-gray-400">Sec {u.section || "N/A"}</p>
+                  <p className="text-sm font-medium text-slate-800 truncate">{u.firstName} {u.lastName}</p>
+                  <p className="text-xs text-slate-400">Sec {u.section || "N/A"}</p>
                 </div>
                 <Checkbox checked={selectedUsers.includes(u._id)} className="pointer-events-none" />
               </div>

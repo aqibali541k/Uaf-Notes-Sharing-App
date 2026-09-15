@@ -5,7 +5,7 @@ import { ShareAltOutlined, DeleteFilled } from "@ant-design/icons";
 import SearchBar from "../SearchBar";
 import { useAuthContext } from "../../../../context/AuthContext";
 import NoteCard from "../../../../components/common/NoteCard";
-import { API_URL } from "../../../../constants";
+import { API_URL, COLORS } from "../../../../constants";
 
 const { Text } = Typography;
 
@@ -112,7 +112,7 @@ const Shared = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
         <Spin size="large" />
-        <Text className="text-sm text-gray-400">Loading shared resources…</Text>
+        <Text className="text-sm text-slate-400">Loading shared resources…</Text>
       </div>
     );
   }
@@ -122,8 +122,8 @@ const Shared = () => {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">Shared Notes</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Collaborative resources shared within the university network</p>
+          <h1 className="text-xl font-semibold text-slate-900">Shared Notes</h1>
+          <p className="text-sm text-slate-500 mt-0.5">Collaborative resources shared within the university network</p>
         </div>
         {notes.length > 0 && (
           <div className="w-full sm:w-64">
@@ -133,9 +133,9 @@ const Shared = () => {
       </div>
 
       {notes.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 border border-dashed border-gray-200 rounded-xl bg-gray-50">
-          <ShareAltOutlined className="text-4xl text-gray-300 mb-3" />
-          <p className="text-sm text-gray-400">No shared notes found</p>
+        <div className="flex flex-col items-center justify-center py-20 border border-dashed border-slate-200 rounded-xl bg-slate-50">
+          <ShareAltOutlined className="text-4xl text-slate-300 mb-3" />
+          <p className="text-sm text-slate-400">No shared notes found</p>
         </div>
       ) : (
         <Row gutter={[20, 20]}>
@@ -179,11 +179,11 @@ const Shared = () => {
         open={isShareOpen}
         onCancel={() => setIsShareOpen(false)}
         footer={null}
-        title={<span className="text-sm font-semibold text-gray-800">Share Resource</span>}
+        title={<span className="text-sm font-semibold text-slate-800">Share Resource</span>}
         centered
       >
         <div className="py-4">
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Select recipients</p>
+          <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-3">Select recipients</p>
           <div className="max-h-64 overflow-y-auto space-y-1 pr-1">
             {users.map((u) => (
               <div
@@ -197,19 +197,19 @@ const Shared = () => {
                 }
                 className={`flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition-colors border ${
                   selectedUsers.includes(u._id)
-                    ? "bg-indigo-50 border-indigo-200"
-                    : "bg-white border-gray-100 hover:bg-gray-50"
+                    ? "bg-brand-50 border-brand-200"
+                    : "bg-white border-slate-100 hover:bg-slate-50"
                 }`}
               >
-                <Avatar size="small" src={u.image} className="bg-indigo-100 text-indigo-600 shrink-0">
+                <Avatar size="small" src={u.image} className="bg-brand-100 text-brand-600 shrink-0">
                   {u.firstName[0]}
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-800 truncate">{u.firstName} {u.lastName}</p>
-                  <p className="text-xs text-gray-400">AG-{u.agNo?.split("-AG-")[1] || "0000"}</p>
+                  <p className="text-sm font-medium text-slate-800 truncate">{u.firstName} {u.lastName}</p>
+                  <p className="text-xs text-slate-400">AG-{u.agNo?.split("-AG-")[1] || "0000"}</p>
                 </div>
                 {selectedUsers.includes(u._id) && (
-                  <span className="w-5 h-5 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xs shrink-0">✓</span>
+                  <span className="w-5 h-5 bg-brand-600 rounded-full flex items-center justify-center text-white text-xs shrink-0">✓</span>
                 )}
               </div>
             ))}
@@ -220,7 +220,7 @@ const Shared = () => {
           onClick={shareNote}
           block
           className="h-9 rounded-lg font-medium"
-          style={{ backgroundColor: "#4f46e5" }}
+          style={{ backgroundColor: COLORS.primary }}
         >
           Share with {selectedUsers.length} student{selectedUsers.length !== 1 ? "s" : ""}
         </Button>

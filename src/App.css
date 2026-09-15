@@ -1,105 +1,44 @@
 @import "tailwindcss";
 
-/* .loader {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  box-sizing: border-box;
-  animation: rotation 1s linear infinite;
+/* ------------------------------------------------------------------
+ * Theme tokens
+ * One flat brand colour used across the whole app. No gradients:
+ * every surface is a solid colour, cards are white with a light
+ * border, and the brand colour is only used for actions and accents.
+ * ------------------------------------------------------------------ */
+@theme {
+  --color-brand-50: #eef2ff;
+  --color-brand-100: #e0e7ff;
+  --color-brand-200: #c7d2fe;
+  --color-brand-300: #a5b4fc;
+  --color-brand-400: #818cf8;
+  --color-brand-500: #6366f1;
+  --color-brand-600: #4f46e5;
+  --color-brand-700: #4338ca;
+  --color-brand-800: #3730a3;
+  --color-brand-900: #312e81;
 }
 
-.loader::after,
-.loader::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  margin: auto;
-  border-radius: 50%;
-  box-sizing: border-box;
-  transform-origin: center center;
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
-.loader::after {
+body {
+  background-color: #f8fafc;
+  color: #1e293b;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Simple flat spinner (used by ScreenLoader) */
+.loader {
+  display: block;
   width: 40px;
   height: 40px;
-  border: 3px solid transparent;
-  border-color: transparent transparent #ff3d00 #ff3d00;
-  animation: rotationBack 0.5s linear infinite;
-}
-
-.loader::before {
-  width: 32px;
-  height: 32px;
-  border: 3px solid #fff;
-  border-color: #fff #fff transparent transparent;
-  animation: rotation 1.5s linear infinite;
-} */
-.loader {
-  width: 106px;
-  height: 56px;
-  display: block;
-  margin: 30px auto;
-  background-image:
-    linear-gradient(#fff 50px, transparent 0),
-    linear-gradient(#fff 50px, transparent 0),
-    linear-gradient(#fff 50px, transparent 0),
-    linear-gradient(#fff 50px, transparent 0),
-    radial-gradient(circle 14px, #fff 100%, transparent 0);
-  background-size:
-    48px 15px,
-    15px 35px,
-    15px 35px,
-    25px 15px,
-    28px 28px;
-  background-position:
-    25px 5px,
-    58px 20px,
-    25px 17px,
-    2px 37px,
-    76px 0px;
-  background-repeat: no-repeat;
-  position: relative;
-  transform: rotate(-45deg);
-  box-sizing: border-box;
-}
-.loader::after,
-.loader::before {
-  content: "";
-  position: absolute;
-  width: 56px;
-  height: 56px;
-  border: 6px solid #fff;
-  border-radius: 50%;
-  left: -45px;
-  top: -10px;
-  background-repeat: no-repeat;
-  background-image:
-    linear-gradient(#fff 64px, transparent 0),
-    linear-gradient(#fff 66px, transparent 0),
-    radial-gradient(circle 4px, #fff 100%, transparent 0);
-  background-size:
-    40px 1px,
-    1px 40px,
-    8px 8px;
-  background-position: center center;
-  box-sizing: border-box;
-  animation: rotation 0.3s linear infinite;
-}
-.loader::before {
-  left: 25px;
-  top: 60px;
+  border-radius: 9999px;
+  border: 3px solid #c7d2fe;
+  border-top-color: #4f46e5;
+  animation: rotation 0.7s linear infinite;
 }
 
 @keyframes rotation {
@@ -111,40 +50,28 @@
   }
 }
 
-@keyframes rotation {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
+@media (prefers-reduced-motion: reduce) {
+  .loader {
+    animation-duration: 1.6s;
   }
 }
 
-@keyframes rotationBack {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(-360deg);
-  }
-
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes rotationBack {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(-360deg);
-  }
-}
-
+/* Thin, visible scrollbars instead of hiding them completely */
 * {
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
 }

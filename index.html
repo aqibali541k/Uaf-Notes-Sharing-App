@@ -1,69 +1,125 @@
 <!doctype html>
-<html lang="en" style="scroll-behavior: smooth">
+<html lang="en">
   <head>
     <!-- Basic -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#4f46e5" />
 
-    <!-- PRIMARY SEO TITLE -->
-    <title>
-      UAF Notes Sharing App | Secure Notes for University of Agriculture
-      Faisalabad
-    </title>
-
-    <!-- META DESCRIPTION -->
+    <!-- Primary SEO -->
+    <title>UAF Notes Sharing App | University of Agriculture Faisalabad</title>
     <meta
       name="description"
-      content="UAF Notes Sharing App is a secure and smart platform for University of Agriculture Faisalabad students to create, manage, and share notes online with full privacy."
+      content="UAF Notes Sharing App lets University of Agriculture Faisalabad students share, browse and download course notes securely by subject and section."
     />
-
-    <!-- KEYWORDS -->
     <meta
-      name="keywords"
-      content="UAF notes sharing app, UAF notes, University of Agriculture Faisalabad notes, student notes app, secure notes sharing, online notes UAF"
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
     />
-
     <meta name="author" content="UAF Notes Sharing App" />
-    <meta name="robots" content="index, follow" />
 
-    <!-- CANONICAL -->
-    <link rel="canonical" href="https://uaf-notes-sharing-app.vercel.app/" />
+    <!-- Canonical (must stay on the production domain) -->
+    <link rel="canonical" href="https://dcspars.dpdns.org/" />
 
-    <!-- OPEN GRAPH (Facebook / WhatsApp / LinkedIn) -->
+    <!-- Open Graph (Facebook, WhatsApp, LinkedIn, Discord) -->
+    <meta property="og:site_name" content="UAF Notes Sharing App" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:type" content="website" />
     <meta
       property="og:title"
-      content="UAF Notes Sharing App | Secure Notes Platform"
+      content="UAF Notes Sharing App | University of Agriculture Faisalabad"
     />
     <meta
       property="og:description"
-      content="A secure notes sharing app for University of Agriculture Faisalabad students. Create, manage, and share notes privately."
+      content="UAF Notes Sharing App lets University of Agriculture Faisalabad students share, browse and download course notes securely by subject and section."
     />
-    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://dcspars.dpdns.org/" />
+    <meta property="og:image" content="https://dcspars.dpdns.org/og-image.png" />
     <meta
-      property="og:url"
-      content="https://uaf-notes-sharing-app.vercel.app/"
+      property="og:image:secure_url"
+      content="https://dcspars.dpdns.org/og-image.png"
     />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta
-      property="og:image"
-      content="https://uaf-notes-sharing-app.vercel.app/og-image.png"
+      property="og:image:alt"
+      content="UAF Notes Sharing App - notes sharing platform for University of Agriculture Faisalabad students"
     />
 
-    <!-- TWITTER SEO -->
+    <!-- Twitter / X card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta
       name="twitter:title"
-      content="UAF Notes Sharing App | Smart Notes for Students"
+      content="UAF Notes Sharing App | University of Agriculture Faisalabad"
     />
     <meta
       name="twitter:description"
-      content="Securely create and share notes online for UAF students with full privacy and speed."
+      content="UAF Notes Sharing App lets University of Agriculture Faisalabad students share, browse and download course notes securely by subject and section."
     />
+    <meta name="twitter:image" content="https://dcspars.dpdns.org/og-image.png" />
     <meta
-      name="twitter:image"
-      content="https://uaf-notes-sharing-app.vercel.app/og-image.png"
+      name="twitter:image:alt"
+      content="UAF Notes Sharing App - notes sharing platform for University of Agriculture Faisalabad students"
     />
 
-    <!-- GOOGLE ANALYTICS (GA4) -->
+    <!-- Favicon -->
+    <link rel="icon" type="image/webp" href="/logo.webp" />
+
+    <!-- Performance hints for third-party analytics -->
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+    <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+
+    <!--
+      Structured data (JSON-LD).
+      Only the homepage is public, so the site-wide graph lives here.
+      Per-route data is injected by src/components/Seo/index.jsx.
+    -->
+    <script type="application/ld+json" id="site-structured-data">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://dcspars.dpdns.org/#organization",
+            "name": "UAF Notes Sharing App",
+            "url": "https://dcspars.dpdns.org/",
+            "logo": {
+              "@type": "ImageObject",
+              "@id": "https://dcspars.dpdns.org/#logo",
+              "url": "https://dcspars.dpdns.org/logo.webp",
+              "width": 256,
+              "height": 256
+            }
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://dcspars.dpdns.org/#website",
+            "name": "UAF Notes Sharing App",
+            "alternateName": "UAF Notes",
+            "url": "https://dcspars.dpdns.org/",
+            "description": "Notes sharing platform for University of Agriculture Faisalabad students.",
+            "inLanguage": "en",
+            "publisher": { "@id": "https://dcspars.dpdns.org/#organization" }
+          },
+          {
+            "@type": "WebApplication",
+            "@id": "https://dcspars.dpdns.org/#webapp",
+            "name": "UAF Notes Sharing App",
+            "url": "https://dcspars.dpdns.org/",
+            "description": "A web app where University of Agriculture Faisalabad students create, organize and share academic course notes by subject and section.",
+            "applicationCategory": "EducationalApplication",
+            "operatingSystem": "Any (web browser)",
+            "browserRequirements": "Requires a modern web browser with JavaScript enabled.",
+            "isAccessibleForFree": true,
+            "inLanguage": "en",
+            "publisher": { "@id": "https://dcspars.dpdns.org/#organization" }
+          }
+        ]
+      }
+    </script>
+
+    <!-- Google Analytics (GA4) -->
     <script
       async
       src="https://www.googletagmanager.com/gtag/js?id=G-777ZYDFQLG"
@@ -76,30 +132,18 @@
       gtag("js", new Date());
       gtag("config", "G-777ZYDFQLG");
     </script>
-
-    <!-- STRUCTURED DATA (RICH RESULTS) -->
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "SoftwareApplication",
-        "name": "UAF Notes Sharing App",
-        "applicationCategory": "ProductivityApplication",
-        "operatingSystem": "Web",
-        "description": "A secure notes sharing platform for University of Agriculture Faisalabad students.",
-        "url": "https://uaf-notes-sharing-app.vercel.app/",
-        "publisher": {
-          "@type": "Organization",
-          "name": "UAF Notes Sharing App"
-        }
-      }
-    </script>
-
-    <!-- FAVICON -->
-    <link rel="icon" href="/logo.webp" />
   </head>
 
   <body>
     <div id="root"></div>
+    <noscript>
+      <h1>UAF Notes Sharing App</h1>
+      <p>
+        A notes sharing platform for University of Agriculture Faisalabad
+        students to create, organize and share course notes. Please enable
+        JavaScript to use the app.
+      </p>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

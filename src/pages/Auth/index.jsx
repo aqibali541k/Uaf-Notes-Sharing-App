@@ -16,6 +16,8 @@ const Auth = () => {
                 <Route path="login" element={<Login />} />
                 <Route path="register" element={<Register />} />
                 <Route path="reset-Password" element={<ResetPassword />} />
+                {/* Unknown auth sub-paths fall back to the login form */}
+                <Route path="*" element={<Navigate to="/auth/login" replace />} />
             </Routes>
         </>
     )

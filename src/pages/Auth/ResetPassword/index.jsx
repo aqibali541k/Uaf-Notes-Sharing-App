@@ -1,8 +1,10 @@
-import { Button, Col, Form, Input, message, Row, Typography } from "antd";
+import { Button, Form, Input, message } from "antd";
 import axios from "axios";
 import React, { useState } from "react";
-
-const { Title } = Typography;
+import { Link } from "react-router-dom";
+import { MailOutlined, ArrowLeftOutlined } from "@ant-design/icons";
+import { API_URL } from "../../../constants";
+import Seo from "../../../components/Seo";
 
 const initialstate = { email: "" };
 
@@ -26,7 +28,7 @@ const ResetPassword = () => {
     setLoading(true);
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/users/reset-password-request`,
+        `${API_URL}/users/reset-password-request`,
         { email: state.email },
       );
 
@@ -41,50 +43,80 @@ const ResetPassword = () => {
     }
   };
 
-  const labelStyle = { color: "#1f2937", fontWeight: 600 };
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-100 via-green-200 to-green-300 px-4">
-      <div className="max-w-md w-full p-8 sm:p-10 rounded-3xl shadow-2xl bg-white/90 backdrop-blur-md border border-green-200">
-        <div className="text-center mb-6">
-          <Title level={2} className="text-green-800 font-extrabold">
-            Reset Password
-          </Title>
-          <p className="text-sm text-green-700">
-            Enter your registered email to receive a reset link
-          </p>
-        </div>
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12">
+      <Seo
+        title="Reset Your Password | UAF Notes Sharing App"
+        description="Request a password reset link for your UAF Notes Sharing App student account."
+        path="/auth/reset-password"
+        noindex
+      />
 
-        <Form
-          layout="vertical"
-          onFinish={handleSubmit}
-          onFinishFailed={handleFailed}
+      <div className="w-full max-w-md">
+        <Link
+          to="/auth/login"
+          className="mb-6 inline-flex items-center text-xs font-medium text-slate-500 transition-colors hover:text-brand-600"
         >
-          <Form.Item
-            label={<span style={labelStyle}>Email</span>}
-            name="email"
-            rules={[
-              { required: true, message: "Email is required" },
-              { type: "email", message: "Please enter a valid email" },
-            ]}
-          >
-            <Input
-              name="email"
-              value={state.email}
-              placeholder="Enter your email"
-              className="rounded-xl py-3 px-4 border-green-300 focus:border-green-500 focus:ring-1 focus:ring-green-400"
-              onChange={handleChange}
-            />
-          </Form.Item>
+          <ArrowLeftOutlined className="mr-2" />
+          Back to login
+        </Link>
 
-          <Button
-            htmlType="submit"
-            loading={loading}
-            className="w-full! py-3! rounded-xl! text-white! bg-green-600! hover:bg-green-700! border-none! shadow-lg! transition-all! duration-300! hover:shadow-2xl!"
+        <div className="rounded-2xl border border-slate-200 bg-white p-8">
+          <div className="mb-6 text-center">
+            <div
+              className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600"
+              aria-hidden="true"
+            >
+              <MailOutlined className="text-xl" />
+            </div>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+              Reset password
+            </h1>
+            <p className="mt-1.5 text-sm text-slate-500">
+              Enter your registered email to receive a reset link
+            </p>
+          </div>
+
+          <Form
+            layout="vertical"
+            onFinish={handleSubmit}
+            onFinishFailed={handleFailed}
+            requiredMark={false}
           >
-            Request Reset Link
-          </Button>
-        </Form>
+            <Form.Item
+              label={
+                <span className="text-xs font-medium text-slate-600">
+                  Email
+                </span>
+              }
+              name="email"
+              rules={[
+                { required: true, message: "Email is required" },
+                { type: "email", message: "Please enter a valid email" },
+              ]}
+            >
+              <Input
+                name="email"
+                type="email"
+                autoComplete="email"
+                value={state.email}
+                placeholder="Enter your email"
+                className="h-10 rounded-lg border-slate-200"
+                onChange={handleChange}
+              />
+            </Form.Item>
+
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              block
+              className="h-10 rounded-lg text-sm font-medium"
+            >
+              Request reset link
+            </Button>
+          </Form>
+        </div>
       </div>
     </div>
   );

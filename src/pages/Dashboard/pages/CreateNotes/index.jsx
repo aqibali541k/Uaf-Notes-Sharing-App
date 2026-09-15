@@ -126,7 +126,7 @@ const CreateNotes = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <div className="min-h-screen bg-slate-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Back + Page Header */}
         <div className="flex items-center gap-3 mb-6">
@@ -134,13 +134,13 @@ const CreateNotes = () => {
             type="text"
             icon={<ArrowLeftOutlined />}
             onClick={() => navigate(-1)}
-            className="text-gray-500 hover:text-gray-800 -ml-2"
+            className="text-slate-500 hover:text-slate-800 -ml-2"
           />
           <div>
-            <h1 className="text-xl font-semibold text-gray-900">
+            <h1 className="text-xl font-semibold text-slate-900">
               {noteToEdit ? "Edit Note" : "Upload Note"}
             </h1>
-            <p className="text-sm text-gray-500 mt-0.5">
+            <p className="text-sm text-slate-500 mt-0.5">
               {noteToEdit
                 ? "Update your resource and visibility settings"
                 : "Upload your notes and choose who can access them"}
@@ -148,12 +148,12 @@ const CreateNotes = () => {
           </div>
         </div>
 
-        <Card className="rounded-xl border border-gray-200 shadow-none">
+        <Card className="rounded-xl border border-slate-200 shadow-none">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-2">
             {/* LEFT — Details */}
             <div className="md:col-span-2 space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Note Title</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Note Title</label>
                 <Input
                   name="title"
                   placeholder="e.g. Statistical Inference — Week 4"
@@ -164,7 +164,7 @@ const CreateNotes = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Category / Course</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Category / Course</label>
                 <Select
                   placeholder="Choose a course…"
                   value={state.category || undefined}
@@ -178,31 +178,31 @@ const CreateNotes = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">
                   {noteToEdit ? "Replace File (optional)" : "Upload Document"}
                 </label>
                 <Dragger
                   beforeUpload={beforeUpload}
                   maxCount={1}
                   showUploadList={false}
-                  className="rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 hover:bg-white transition-colors"
+                  className="rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 hover:bg-white transition-colors"
                 >
                   <p className="ant-upload-drag-icon pt-4">
-                    <UploadOutlined className="text-2xl text-indigo-500" />
+                    <UploadOutlined className="text-2xl text-brand-500" />
                   </p>
                   <p className="ant-upload-text text-sm font-medium pb-1">Click or drag file to upload</p>
-                  <p className="ant-upload-hint pb-4 text-xs text-gray-400">Max 10MB</p>
+                  <p className="ant-upload-hint pb-4 text-xs text-slate-400">Max 10MB</p>
                 </Dragger>
 
                 {state.file && (
-                  <div className="mt-3 flex items-center justify-between bg-indigo-50 border border-indigo-100 rounded-lg p-3">
+                  <div className="mt-3 flex items-center justify-between bg-brand-50 border border-brand-100 rounded-lg p-3">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 bg-white border border-indigo-100 rounded-lg flex items-center justify-center">
-                        <UploadOutlined className="text-indigo-500 text-sm" />
+                      <div className="w-8 h-8 bg-white border border-brand-100 rounded-lg flex items-center justify-center">
+                        <UploadOutlined className="text-brand-500 text-sm" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-800 line-clamp-1">{state.file.name}</p>
-                        <p className="text-xs text-gray-400">{(state.file.size / (1024 * 1024)).toFixed(2)} MB</p>
+                        <p className="text-sm font-medium text-slate-800 line-clamp-1">{state.file.name}</p>
+                        <p className="text-xs text-slate-400">{(state.file.size / (1024 * 1024)).toFixed(2)} MB</p>
                       </div>
                     </div>
                     <Button
@@ -235,38 +235,38 @@ const CreateNotes = () => {
 
             {/* RIGHT — Visibility */}
             <div className="space-y-4">
-              <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
-                <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-4">
-                  <LockOutlined className="text-indigo-600" /> Visibility
+              <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2 mb-4">
+                  <LockOutlined className="text-brand-600" /> Visibility
                 </h3>
 
                 <div className="space-y-2">
                   <div
                     className={`p-3 rounded-lg border-2 cursor-pointer transition-colors ${
-                      state.isPrivate ? "border-indigo-600 bg-white" : "border-gray-200 opacity-60 hover:opacity-80"
+                      state.isPrivate ? "border-brand-600 bg-white" : "border-slate-200 opacity-60 hover:opacity-80"
                     }`}
                     onClick={() => setState((s) => ({ ...s, isPrivate: true, sharedWith: [] }))}
                   >
                     <div className="flex items-center gap-2.5">
                       <Checkbox checked={state.isPrivate} className="pointer-events-none" />
                       <div>
-                        <p className="text-sm font-medium text-gray-800">Private</p>
-                        <p className="text-xs text-gray-500">Only shared contacts can view</p>
+                        <p className="text-sm font-medium text-slate-800">Private</p>
+                        <p className="text-xs text-slate-500">Only shared contacts can view</p>
                       </div>
                     </div>
                   </div>
 
                   <div
                     className={`p-3 rounded-lg border-2 cursor-pointer transition-colors ${
-                      !state.isPrivate ? "border-indigo-600 bg-white" : "border-gray-200 opacity-60 hover:opacity-80"
+                      !state.isPrivate ? "border-brand-600 bg-white" : "border-slate-200 opacity-60 hover:opacity-80"
                     }`}
                     onClick={() => setState((s) => ({ ...s, isPrivate: false }))}
                   >
                     <div className="flex items-center gap-2.5">
                       <Checkbox checked={!state.isPrivate} className="pointer-events-none" />
                       <div>
-                        <p className="text-sm font-medium text-gray-800">Public</p>
-                        <p className="text-xs text-gray-500">Anyone can view and download</p>
+                        <p className="text-sm font-medium text-slate-800">Public</p>
+                        <p className="text-xs text-slate-500">Anyone can view and download</p>
                       </div>
                     </div>
                   </div>
@@ -274,16 +274,16 @@ const CreateNotes = () => {
 
                 {state.isPrivate && (
                   <div className="mt-5">
-                    <label className="block text-xs font-medium text-gray-500 mb-3">Share with students</label>
+                    <label className="block text-xs font-medium text-slate-500 mb-3">Share with students</label>
                     <div className="max-h-52 overflow-y-auto space-y-1">
                       {users.length === 0 ? (
-                        <p className="text-xs text-gray-400 text-center py-3">No students available</p>
+                        <p className="text-xs text-slate-400 text-center py-3">No students available</p>
                       ) : (
                         users.map((u) => (
                           <div
                             key={u._id}
                             className={`flex items-center justify-between px-2.5 py-2 rounded-lg cursor-pointer transition-colors ${
-                              state.sharedWith.includes(u._id) ? "bg-indigo-50" : "hover:bg-gray-100"
+                              state.sharedWith.includes(u._id) ? "bg-brand-50" : "hover:bg-slate-100"
                             }`}
                             onClick={() => {
                               const checked = !state.sharedWith.includes(u._id);
@@ -295,7 +295,7 @@ const CreateNotes = () => {
                               }));
                             }}
                           >
-                            <span className="text-sm text-gray-700">{u.firstName} {u.lastName}</span>
+                            <span className="text-sm text-slate-700">{u.firstName} {u.lastName}</span>
                             <Checkbox checked={state.sharedWith.includes(u._id)} className="pointer-events-none" />
                           </div>
                         ))
@@ -311,7 +311,7 @@ const CreateNotes = () => {
 
           <div className="flex gap-3 px-2 pb-2">
             <Button
-              className="rounded-lg h-9 px-6 border-gray-200 text-gray-600"
+              className="rounded-lg h-9 px-6 border-slate-200 text-slate-600"
               onClick={() => navigate(-1)}
             >
               Cancel

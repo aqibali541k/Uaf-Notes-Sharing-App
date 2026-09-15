@@ -51,8 +51,8 @@ const Profile = () => {
 
   if (!isAuth) return (
     <div className="flex items-center justify-center min-h-[60vh]">
-      <Card className="text-center rounded-xl border border-gray-200 shadow-sm p-8">
-        <p className="text-gray-500">Please log in to view your profile.</p>
+      <Card className="text-center rounded-xl border border-slate-200 shadow-sm p-8">
+        <p className="text-slate-500">Please log in to view your profile.</p>
       </Card>
     </div>
   );
@@ -95,9 +95,9 @@ const Profile = () => {
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      <Card className="rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <Card className="rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         {/* Cover */}
-        <div className="h-28 bg-indigo-600" />
+        <div className="h-28 bg-brand-600" />
 
         <div className="px-6 pb-8">
           {/* Avatar + Name + Actions */}
@@ -107,7 +107,7 @@ const Profile = () => {
                 size={96}
                 src={preview || profile.image}
                 icon={<UserOutlined />}
-                className="border-4 border-white shadow-md bg-gray-100"
+                className="border-4 border-white shadow-md bg-slate-100"
               />
               {editMode && (
                 <label className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
@@ -118,13 +118,13 @@ const Profile = () => {
             </div>
 
             <div className="text-center sm:text-left flex-1 pb-2">
-              <h1 className="text-lg font-semibold text-gray-900">{profile.firstName} {profile.lastName}</h1>
+              <h1 className="text-lg font-semibold text-slate-900">{profile.firstName} {profile.lastName}</h1>
               <div className="flex flex-wrap justify-center sm:justify-start gap-2 mt-1.5">
-                <span className="flex items-center gap-1 text-xs text-gray-500 bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-md">
-                  <MailOutlined className="text-indigo-500" style={{ fontSize: 11 }} /> {profile.email}
+                <span className="flex items-center gap-1 text-xs text-slate-500 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-md">
+                  <MailOutlined className="text-brand-500" style={{ fontSize: 11 }} /> {profile.email}
                 </span>
-                <span className="flex items-center gap-1 text-xs text-gray-500 bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-md">
-                  <IdcardOutlined className="text-indigo-500" style={{ fontSize: 11 }} /> {profile.agNo || "—"}
+                <span className="flex items-center gap-1 text-xs text-slate-500 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-md">
+                  <IdcardOutlined className="text-brand-500" style={{ fontSize: 11 }} /> {profile.agNo || "—"}
                 </span>
               </div>
             </div>
@@ -167,7 +167,7 @@ const Profile = () => {
           <div className="mt-6">
             <Row gutter={[40, 32]}>
               <Col span={24} md={12}>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Personal Information</p>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-4">Personal Information</p>
                 <div className="space-y-4">
                   <EditableField label="First Name" name="firstName" value={formData.firstName} editMode={editMode} onChange={handleChange} />
                   <EditableField label="Last Name" name="lastName" value={formData.lastName} editMode={editMode} onChange={handleChange} />
@@ -176,7 +176,7 @@ const Profile = () => {
               </Col>
 
               <Col span={24} md={12}>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Academic Details</p>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-4">Academic Details</p>
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <EditableSelect label="Degree" name="degree" value={formData.degree} options={["BSCS", "BSIT", "BBA", "BSSE", "BSAI", "Other"]} editMode={editMode} onChange={handleSelectChange} />
@@ -190,11 +190,11 @@ const Profile = () => {
                     editMode={editMode}
                     onChange={(e) => setFormData((p) => ({ ...p, agNo: e.target.value.toUpperCase() }))}
                   />
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                    <span className="flex items-center gap-1.5 text-xs text-gray-400">
+                  <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                    <span className="flex items-center gap-1.5 text-xs text-slate-400">
                       <CalendarOutlined /> Joined
                     </span>
-                    <span className="text-xs font-medium text-gray-600">
+                    <span className="text-xs font-medium text-slate-600">
                       {profile.createdAt
                         ? new Date(profile.createdAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
                         : "—"}
@@ -214,19 +214,19 @@ const Profile = () => {
 
 const EditableField = ({ label, name, value, editMode, onChange, icon }) => (
   <div>
-    <label className="block text-xs font-medium text-gray-500 mb-1.5">{label}</label>
+    <label className="block text-xs font-medium text-slate-500 mb-1.5">{label}</label>
     {editMode ? (
       <Input
         name={name}
         value={value}
         onChange={onChange}
         prefix={icon}
-        className="rounded-lg h-9 border-gray-200 focus:border-indigo-500 hover:border-indigo-400 transition-colors"
+        className="rounded-lg h-9 border-slate-200 focus:border-brand-500 hover:border-brand-400 transition-colors"
       />
     ) : (
-      <div className="h-9 flex items-center px-3 bg-gray-50 rounded-lg border border-gray-200 text-sm text-gray-700">
-        {icon && <span className="mr-2 text-indigo-400">{icon}</span>}
-        {value || <span className="text-gray-300">Not provided</span>}
+      <div className="h-9 flex items-center px-3 bg-slate-50 rounded-lg border border-slate-200 text-sm text-slate-700">
+        {icon && <span className="mr-2 text-brand-400">{icon}</span>}
+        {value || <span className="text-slate-300">Not provided</span>}
       </div>
     )}
   </div>
@@ -234,7 +234,7 @@ const EditableField = ({ label, name, value, editMode, onChange, icon }) => (
 
 const EditableSelect = ({ label, name, value, options, editMode, onChange }) => (
   <div>
-    <label className="block text-xs font-medium text-gray-500 mb-1.5">{label}</label>
+    <label className="block text-xs font-medium text-slate-500 mb-1.5">{label}</label>
     {editMode ? (
       <Select
         value={value}
@@ -244,8 +244,8 @@ const EditableSelect = ({ label, name, value, options, editMode, onChange }) => 
         {options.map((opt) => <Option key={opt} value={opt}>{opt}</Option>)}
       </Select>
     ) : (
-      <div className="h-9 flex items-center px-3 bg-gray-50 rounded-lg border border-gray-200 text-sm text-gray-700">
-        {value || <span className="text-gray-300">N/A</span>}
+      <div className="h-9 flex items-center px-3 bg-slate-50 rounded-lg border border-slate-200 text-sm text-slate-700">
+        {value || <span className="text-slate-300">N/A</span>}
       </div>
     )}
   </div>

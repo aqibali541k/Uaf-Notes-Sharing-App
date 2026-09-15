@@ -1,11 +1,34 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import SearchBar from "../../Dashboard/pages/SearchBar";
-import { Spin, message } from "antd";
+import { message } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 import { useAuthContext } from "../../../context/AuthContext";
-import { API_URL, CATEGORIES } from "../../../constants";
+import { Link } from "react-router-dom";
+import { API_URL, CATEGORIES, SITE_URL } from "../../../constants";
 import NoteCard from "../../../components/common/NoteCard";
 import LoadingSkeleton from "../../../components/common/LoadingSkeleton";
+import Seo from "../../../components/Seo";
+
+/* Homepage structured data. Kept at module scope so the object identity
+ * stays stable between renders (it is used in the effect dependencies). */
+const HOME_STRUCTURED_DATA = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "@id": `${SITE_URL}/#home`,
+  name: "UAF Notes Sharing App",
+  url: `${SITE_URL}/`,
+  description:
+    "Public collection of course notes shared by University of Agriculture Faisalabad students, grouped by section and subject.",
+  inLanguage: "en",
+  isPartOf: { "@id": `${SITE_URL}/#website` },
+};
+
+const slugify = (value) =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
 
 const Public = () => {
   const { token } = useAuthContext();
@@ -13,14 +36,18 @@ const Public = () => {
   const [notes, setNotes] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
+  const [needsSignIn, setNeedsSignIn] = useState(false);
   const [downloadingId, setDownloadingId] = useState(null);
 
   useEffect(() => {
     const fetchNotes = async () => {
       setLoading(true);
       try {
+        /* Guest friendly: the auth token is only attached when a student
+         * is signed in, so the public notes list can also render for
+         * visitors and search-engine crawlers. */
         const res = await axios.get(`${API_URL}/notes/public`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
 
         let notesData = [];
@@ -33,18 +60,26 @@ const Public = () => {
         }
 
         setNotes(notesData);
+        setNeedsSignIn(false);
       } catch (error) {
-        console.error("Error fetching public notes:", error);
+        const status = error.response?.status;
+
+        /* If this deployment still protects the route with a session,
+         * show a sign-in prompt instead of an empty page. */
+        if (status === 401 || status === 403) {
+          setNeedsSignIn(true);
+        } else {
+          console.error("Error fetching public notes:", error);
+          message.error("Failed to load notes");
+        }
+
         setNotes([]);
-        message.error("Failed to load notes");
       } finally {
         setLoading(false);
       }
     };
 
-    if (token) {
-      fetchNotes();
-    }
+    fetchNotes();
   }, [token]);
 
   const filteredNotes = notes.filter((note) =>
@@ -88,77 +123,153 @@ const Public = () => {
     }
   };
 
-  const renderSection = (title, notesArr, accentColor) => (
-    <div className="mb-24">
-      <div className="text-center mb-16">
-        <h2 className={`text-4xl font-extrabold ${accentColor} mb-4 tracking-tight`}>
-          {title}
-        </h2>
-        <div className={`w-20 h-1.5 mx-auto bg-current opacity-20 rounded-full`} />
-      </div>
+  const renderSection = (title, notesArr, accentBar) => {
+    const headingId = `${slugify(title)}-heading`;
 
-      {groupByCategory(notesArr).map(
-        ({ category, notes }) =>
-          notes.length > 0 && (
-            <div key={category} className="mb-20 last:mb-0">
-              <div className="flex items-center gap-4 mb-10">
-                <h3 className="text-2xl font-bold text-gray-800 shrink-0">
-                  {category}
-                </h3>
-                <div className="h-px bg-gray-200 w-full" />
-                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">
-                  {notes.length} Notes
-                </span>
-              </div>
+    return (
+      <section key={headingId} aria-labelledby={headingId} className="mb-16">
+        <div className="mb-8 flex items-center gap-3">
+          <span
+            className={`h-6 w-1 rounded-full ${accentBar}`}
+            aria-hidden="true"
+          />
+          <h2
+            id={headingId}
+            className="text-2xl font-bold tracking-tight text-slate-900"
+          >
+            {title}
+          </h2>
+          <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-500">
+            {notesArr.length} notes
+          </span>
+        </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {notes.map((note) => (
-                  <NoteCard
-                    key={note._id}
-                    note={note}
-                    onDownload={handleDownload}
-                    downloadingId={downloadingId}
+        {groupByCategory(notesArr).map(
+          ({ category, notes }) =>
+            notes.length > 0 && (
+              <div key={category} className="mb-12 last:mb-0">
+                <div className="mb-6 flex items-center gap-4">
+                  <h3 className="text-lg font-semibold text-slate-800">
+                    {category}
+                  </h3>
+                  <span
+                    className="h-px flex-1 bg-slate-200"
+                    aria-hidden="true"
                   />
-                ))}
+                  <span className="text-xs font-medium text-slate-400">
+                    {notes.length} notes
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {notes.map((note) => (
+                    <NoteCard
+                      key={note._id}
+                      note={note}
+                      onDownload={handleDownload}
+                      downloadingId={downloadingId}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-          )
-      )}
-    </div>
-  );
+            )
+        )}
+      </section>
+    );
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      {/* Hero Section */}
-      <div className="bg-white border-b border-gray-100 py-16 mb-12">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <h1 className="text-5xl font-black text-gray-900 mb-4 tracking-tight">
-            Knowledge <span className="text-indigo-600">Shared</span>
-          </h1>
-          <p className="text-gray-500 text-lg max-w-2xl mx-auto mb-10">
-            Access high-quality university notes shared by your peers. Search, browse, and download resources instantly.
-          </p>
-          <div className="max-w-xl mx-auto">
-            <SearchBar onSearch={setSearchTerm} />
+    <div className="bg-slate-50">
+      <Seo
+        title="UAF Notes Sharing App | University of Agriculture Faisalabad"
+        description="UAF Notes Sharing App lets University of Agriculture Faisalabad students share, browse and download course notes securely by subject and section."
+        path="/"
+        structuredData={HOME_STRUCTURED_DATA}
+      />
+
+      {/* Hero */}
+      <section
+        aria-labelledby="home-heading"
+        className="border-b border-slate-200 bg-white py-14 sm:py-20"
+      >
+        <div className="mx-auto max-w-7xl px-4">
+          <div className="mx-auto max-w-2xl text-center">
+            <h1
+              id="home-heading"
+              className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl"
+            >
+              UAF Notes <span className="text-brand-600">Sharing App</span>
+            </h1>
+            <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-slate-500 sm:text-lg">
+              Browse course notes shared by University of Agriculture
+              Faisalabad students. Search by subject and section, then download
+              the notes you need for your semester.
+            </p>
+            <div className="mx-auto mt-8 max-w-xl">
+              <SearchBar onSearch={setSearchTerm} />
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         {loading ? (
-          <div className="py-20">
+          <div role="status" aria-live="polite">
+            <span className="sr-only">Loading shared notes…</span>
             <LoadingSkeleton count={6} />
           </div>
+        ) : needsSignIn ? (
+          <div className="mx-auto max-w-md rounded-xl border border-slate-200 bg-white px-6 py-12 text-center">
+            <div
+              className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-brand-50 text-brand-600"
+              aria-hidden="true"
+            >
+              <SearchOutlined className="text-lg" />
+            </div>
+            <h2 className="text-lg font-semibold text-slate-900">
+              Sign in to browse the shared notes
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-slate-500">
+              Notes are shared between registered UAF students. Sign in with
+              your student account, or create a free one, to open the notes
+              library.
+            </p>
+            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+              <Link
+                to="/auth/login"
+                className="inline-flex items-center justify-center rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-700"
+              >
+                Student login
+              </Link>
+              <Link
+                to="/auth/register"
+                className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+              >
+                Create a free account
+              </Link>
+            </div>
+          </div>
         ) : filteredNotes.length === 0 ? (
-          <div className="text-center py-40">
-            <div className="text-6xl mb-6">🔍</div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">No notes found</h3>
-            <p className="text-gray-500">Try adjusting your search or check back later.</p>
+          <div className="py-20 text-center">
+            <div
+              className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-400"
+              aria-hidden="true"
+            >
+              <SearchOutlined className="text-xl" />
+            </div>
+            <h2 className="text-lg font-semibold text-slate-800">
+              No notes found
+            </h2>
+            <p className="mt-1.5 text-sm text-slate-500">
+              Try adjusting your search or check back later.
+            </p>
           </div>
         ) : (
           <>
-            {sectionANotes.length > 0 && renderSection("Section A Notes", sectionANotes, "text-indigo-600")}
-            {sectionBNotes.length > 0 && renderSection("Section B Notes", sectionBNotes, "text-emerald-600")}
+            {sectionANotes.length > 0 &&
+              renderSection("Section A Notes", sectionANotes, "bg-brand-600")}
+            {sectionBNotes.length > 0 &&
+              renderSection("Section B Notes", sectionBNotes, "bg-teal-600")}
           </>
         )}
       </div>
@@ -166,4 +277,4 @@ const Public = () => {
   );
 };
 
-export default Public;
+export default Public;
